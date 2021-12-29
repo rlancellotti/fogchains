@@ -13,6 +13,7 @@
 fogchains
 fogchains_dbg
 out/*
+src/out/*
 *.sca
 *.vec
 *.vci
