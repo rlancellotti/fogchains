@@ -9,7 +9,7 @@ packet MultiJob
     simtime_t slaDeadline;      // deadline for SLA (-1 for no deadline)
 	simtime_t suggestedTime[];  // suggested service time. Array of values
     int outputs[];				// IDs of the output routes traversed
-    int chain;                  // ID of the service chain -- similar to AppID
+    int appId;                  // ID of the application (service chain)
     int serviceCount;           // the number of services traversed by the job
     int queueCount;             // the number of queue modules visited by the job
     int delayCount;             // the number of delay modules visited by the job

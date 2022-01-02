@@ -42,6 +42,7 @@ void MultiSource::initialize()
  * When the timer is triggered, the job is created, initialized and send 'out'
  * Next timer is scheduled
  */
+
 void MultiSource::handleMessage(cMessage *msg)
 {
     ASSERT(msg==timerMessage);
@@ -52,16 +53,19 @@ void MultiSource::handleMessage(cMessage *msg)
     job->setQueuingTime(0.0);
     job->setServiceTime(0.0);
     job->setDelayTime(0.0);
-    // FIXME: consider array nature of times
-    //job->setSuggestedTime(par("suggestedTime").doubleValue());
-    int srv=0;
-    while(true){
-        std::string parname = "suggestedTime_" + std::to_string(srv);
-        simtime_t val;
-        job->setSuggestedTime(srv, par(parname.c_str()).doubleValue());
-    }
     job->setQueueCount(0);
     job->setDelayCount(0);
+    //FIXME: use parameter
+    job->setAppId(par("appId").intValue());
+    int chainLenght=par("chainLenght").intValue();
+    job->setSuggestedTimeArraySize(chainLenght); 
+    job->setOutputsArraySize(chainLenght); 
+    for (int i=0; i<chainLenght; i++){
+        std::string partimename = "suggestedTime_" + std::to_string(i);
+        job->setSuggestedTime(i, par(partimename.c_str()).doubleValue());
+        std::string paroutname = "output_" + std::to_string(i);
+        job->setOutputs(i, par(paroutname.c_str()).intValue());
+    }
     if (par("suggestedDeadline").doubleValue()>0){
         job->setSlaDeadline(simTime()+par("suggestedDeadline").doubleValue());
     } else {
