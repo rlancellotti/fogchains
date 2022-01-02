@@ -31,7 +31,7 @@ simple MultiSource
         // exit link after each service. Only #0 is shown
         // int x means go to exit X
         // -1 means remain on same node
-        int output_0 = default -1; 
+        int output_0 = default(-1); 
         double suggestedDeadline @unit(s) = default(-1s);
         double maxInterval @unit(s) = default(-1s);
         int appId = default(0);
