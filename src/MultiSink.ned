@@ -18,7 +18,7 @@ package fog;
 //
 // Consumes received messages and collects statistics
 //
-simple FogSinkSimple
+simple MultiSink
 {
     parameters:
         @display("i=block/sink");
@@ -36,7 +36,6 @@ simple FogSinkSimple
         @statistic[totalServiceTime](title="the total time spent being processed by arrived jobs";unit=s;record=vector?,stats;interpolationmode=none);
         @statistic[queuesVisited](title="the total number of queues visited by arrived jobs";record=vector?,stats;interpolationmode=none);
         @statistic[delaysVisited](title="the total number of delays visited by arrived jobs";record=vector?,stats;interpolationmode=none);
-
     gates:
         input in[];
 }
