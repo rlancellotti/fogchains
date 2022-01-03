@@ -13,24 +13,24 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "MultiSource.h"
+#include "SourceMulti.h"
 #include "MultiJob_m.h"
 
 namespace fog {
 
-Define_Module(MultiSource);
+Define_Module(SourceMulti);
 
-MultiSource::MultiSource()
+SourceMulti::SourceMulti()
 {
     timerMessage = NULL;
 }
 
-MultiSource::~MultiSource()
+SourceMulti::~SourceMulti()
 {
     cancelAndDelete(timerMessage);
 }
 
-void MultiSource::initialize()
+void SourceMulti::initialize()
 {
     timerMessage = new cMessage("timer");
     maxInterval = par("maxInterval").doubleValue();
@@ -43,7 +43,7 @@ void MultiSource::initialize()
  * Next timer is scheduled
  */
 
-void MultiSource::handleMessage(cMessage *msg)
+void SourceMulti::handleMessage(cMessage *msg)
 {
     ASSERT(msg==timerMessage);
     simtime_t t, trand;
@@ -86,7 +86,7 @@ void MultiSource::handleMessage(cMessage *msg)
     scheduleAt(t, timerMessage);
 }
 
-const char *MultiSource::getJobName(){
+const char *SourceMulti::getJobName(){
     return par("jobName");
 }
 

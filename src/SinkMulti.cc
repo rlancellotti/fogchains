@@ -1,11 +1,11 @@
 #include "MultiJob_m.h"
-#include "MultiSink.h"
+#include "SinkMulti.h"
 
 namespace fog {
 
-Define_Module(MultiSink);
+Define_Module(SinkMulti);
 
-void MultiSink::initialize()
+void SinkMulti::initialize()
 {
     responseTimeSignal = registerSignal("responseTime");
     totalQueueingTimeSignal = registerSignal("totalQueueingTime");
@@ -18,7 +18,7 @@ void MultiSink::initialize()
     //keepJobs = par("keepJobs");
 }
 
-void MultiSink::handleMessage(cMessage *msg)
+void SinkMulti::handleMessage(cMessage *msg)
 {
     MultiJob *job = check_and_cast<MultiJob *>(msg);
 
@@ -32,7 +32,7 @@ void MultiSink::handleMessage(cMessage *msg)
     delete msg;
 }
 
-void MultiSink::finish()
+void SinkMulti::finish()
 {
     // TODO missing scalar statistics
 }
