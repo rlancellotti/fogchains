@@ -17,12 +17,14 @@ PUMulti::PUMulti()
 {
     jobServiced = nullptr;
     endServiceMsg = nullptr;
+    timeoutMsg = nullptr;
 }
 
 PUMulti::~PUMulti()
 {
     delete jobServiced;
     cancelAndDelete(endServiceMsg);
+    cancelAndDelete(timeoutMsg);
 }
 
 void PUMulti::initialize()
@@ -33,17 +35,22 @@ void PUMulti::initialize()
     emit(queueLengthSignal, 0);
     busySignal = registerSignal("busy");
     emit(busySignal, false);
-
+    speedup=par("speedup");
     endServiceMsg = new cMessage("end-service");
-    fifo = par("fifo");
+    timeoutMsg = new cMessage("timeout");
     capacity = par("capacity");
     queue.setName("queue");
 }
 
 void PUMulti::handleMessage(cMessage *msg)
 {
-    if (msg == endServiceMsg) {
-        endService(jobServiced);
+    // End Service or Timeout
+    if (msg == endServiceMsg || msg == timeoutMsg) {
+        if (msg == endServiceMsg){
+            endService(jobServiced);
+        } else if (msg == endServiceMsg){
+            abortService(jobServiced);
+        }
         if (queue.isEmpty()) {
             jobServiced = nullptr;
             emit(busySignal, false);
@@ -51,35 +58,32 @@ void PUMulti::handleMessage(cMessage *msg)
         else {
             jobServiced = getFromQueue();
             emit(queueLengthSignal, length());
-            simtime_t serviceTime = startService(jobServiced);
-            scheduleAt(simTime()+serviceTime, endServiceMsg);
+            startService(jobServiced);
         }
+        return;
+    }
+    // New job
+    MultiJob *job = check_and_cast<MultiJob *>(msg);
+    arrival(job);
+    if (!jobServiced) {
+        // processor was idle
+        jobServiced = job;
+        emit(busySignal, true);
+        startService(jobServiced);
     }
     else {
-        MultiJob *job = check_and_cast<MultiJob *>(msg);
-        arrival(job);
-
-        if (!jobServiced) {
-            // processor was idle
-            jobServiced = job;
-            emit(busySignal, true);
-            simtime_t serviceTime = startService(jobServiced);
-            scheduleAt(simTime()+serviceTime, endServiceMsg);
+        // check for container capacity
+        if (capacity >= 0 && queue.getLength() >= capacity) {
+            EV << "Capacity full! Job dropped.\n";
+            if (hasGUI())
+                bubble("Dropped!");
+            emit(droppedSignal, 1);
+            delete job;
+            return;
         }
-        else {
-            // check for container capacity
-            if (capacity >= 0 && queue.getLength() >= capacity) {
-                EV << "Capacity full! Job dropped.\n";
-                if (hasGUI())
-                    bubble("Dropped!");
-                emit(droppedSignal, 1);
-                delete job;
-                return;
-            }
-            queue.insert(job);
-            emit(queueLengthSignal, length());
-            job->setQueueCount(job->getQueueCount() + 1);
-        }
+        queue.insert(job);
+        emit(queueLengthSignal, length());
+        job->setQueueCount(job->getQueueCount() + 1);
     }
 }
 
@@ -104,7 +108,7 @@ void PUMulti::arrival(MultiJob *job)
     job->setTimestamp();
 }
 
-simtime_t PUMulti::startService(MultiJob *job)
+void PUMulti::startService(MultiJob *job)
 {
     // gather queueing time statistics
     simtime_t d = simTime() - job->getTimestamp();
@@ -112,7 +116,13 @@ simtime_t PUMulti::startService(MultiJob *job)
     job->setQueuingTime(job->getQueuingTime() + d);
     EV << "Starting service of " << job->getName() << endl;
     job->setTimestamp();
-    return par("serviceTime").doubleValue();
+    // get service time
+    int nservice=job->getServiceCount();
+    simtime_t serviceTime=job->getSuggestedTime(nservice);
+    scheduleAt(simTime()+serviceTime, endServiceMsg);
+    if (job->getSlaDeadline()>0){
+        scheduleAt(job->getSlaDeadline(), timeoutMsg);
+    }
 }
 
 void PUMulti::endService(MultiJob *job)
@@ -120,8 +130,20 @@ void PUMulti::endService(MultiJob *job)
     EV << "Finishing service of " << job->getName() << endl;
     simtime_t d = simTime() - job->getTimestamp();
     job->setServiceTime(job->getServiceTime() + d);
+    cancelEvent(timeoutMsg);
     send(job, "out");
 }
+
+void PUMulti::abortService(MultiJob *job)
+{
+    EV << "Timout for " << job->getName() << endl;
+    if (hasGUI())
+        bubble("Dropped!");
+    emit(droppedSignal, 1);
+    cancelEvent(endServiceMsg);
+    delete job;
+}
+
 
 void PUMulti::finish()
 {

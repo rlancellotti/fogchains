@@ -37,7 +37,7 @@ class PUMulti : public cSimpleModule
         cMessage *timeoutMsg;
         cQueue queue;
         int capacity;
-        bool fifo;
+        double speedup;
         MultiJob *getFromQueue();
 
     public:
@@ -51,10 +51,10 @@ class PUMulti : public cSimpleModule
         virtual void refreshDisplay() const override;
         virtual void finish() override;
 
-        // hook functions to (re)define behaviour
         virtual void arrival(MultiJob *job);
-        virtual simtime_t startService(MultiJob *job);
+        virtual void startService(MultiJob *job);
         virtual void endService(MultiJob *job);
+        virtual void abortService(MultiJob *job);
 };
 
 }; //namespace

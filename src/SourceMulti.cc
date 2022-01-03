@@ -33,7 +33,7 @@ SourceMulti::~SourceMulti()
 void SourceMulti::initialize()
 {
     timerMessage = new cMessage("timer");
-    maxInterval = par("maxInterval").doubleValue();
+    maxInterval = par("maxInterval");
     sentJobSignal = registerSignal("sentJob");
     scheduleAt(simTime(), timerMessage);
 }
@@ -62,12 +62,12 @@ void SourceMulti::handleMessage(cMessage *msg)
     job->setOutputsArraySize(chainLenght); 
     for (int i=0; i<chainLenght; i++){
         std::string partimename = "suggestedTime_" + std::to_string(i);
-        job->setSuggestedTime(i, par(partimename.c_str()).doubleValue());
+        job->setSuggestedTime(i, par(partimename.c_str()));
         std::string paroutname = "output_" + std::to_string(i);
         job->setOutputs(i, par(paroutname.c_str()).intValue());
     }
-    if (par("suggestedDeadline").doubleValue()>0){
-        job->setSlaDeadline(simTime()+par("suggestedDeadline").doubleValue());
+    if (par("suggestedDeadline").doubleValue()>0.0){
+        job->setSlaDeadline(simTime()+par("suggestedDeadline"));
     } else {
         job->setSlaDeadline(-1.0);
     }
@@ -76,7 +76,7 @@ void SourceMulti::handleMessage(cMessage *msg)
     //job->setId(nextJobId++);
     send(job, "out");
     // schedule next message
-    trand=par("sendInterval").doubleValue();
+    trand=par("sendInterval");
     if (maxInterval>0 && trand>maxInterval){
         t=simTime() + maxInterval;
     } else {

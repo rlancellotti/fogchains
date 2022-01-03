@@ -18,7 +18,7 @@ package fog;
 //
 // Consumes received messages and collects statistics
 //
-simple MultiSink
+simple SinkMulti
 {
     parameters:
         @display("i=block/sink");
