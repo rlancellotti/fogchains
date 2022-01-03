@@ -7,6 +7,7 @@ package fog;
 simple DispatcherMulti
 {
     parameters:
+        @display("i=block/dispatch");    
     gates:
         input in;
         output out[];
