@@ -13,22 +13,19 @@ namespace fog {
 
 Define_Module(PUMulti);
 
-PUMulti::PUMulti()
-{
+PUMulti::PUMulti() {
     jobServiced = nullptr;
     endServiceMsg = nullptr;
     timeoutMsg = nullptr;
 }
 
-PUMulti::~PUMulti()
-{
+PUMulti::~PUMulti() {
     delete jobServiced;
     cancelAndDelete(endServiceMsg);
     cancelAndDelete(timeoutMsg);
 }
 
-void PUMulti::initialize()
-{
+void PUMulti::initialize() {
     droppedSignal = registerSignal("dropped");
     queueingTimeSignal = registerSignal("queueingTime");
     queueLengthSignal = registerSignal("queueLength");
@@ -42,8 +39,7 @@ void PUMulti::initialize()
     queue.setName("queue");
 }
 
-void PUMulti::handleMessage(cMessage *msg)
-{
+void PUMulti::handleMessage(cMessage *msg) {
     // End Service or Timeout
     if (msg == endServiceMsg || msg == timeoutMsg) {
         if (msg == endServiceMsg){
@@ -87,29 +83,24 @@ void PUMulti::handleMessage(cMessage *msg)
     }
 }
 
-void PUMulti::refreshDisplay() const
-{
+void PUMulti::refreshDisplay() const {
     getDisplayString().setTagArg("i2", 0, jobServiced ? "status/execute" : "");
     getDisplayString().setTagArg("i", 1, queue.isEmpty() ? "" : "cyan");
 }
 
-MultiJob *PUMulti::getFromQueue()
-{
+MultiJob *PUMulti::getFromQueue() {
     return (MultiJob *)queue.pop();
 }
 
-int PUMulti::length()
-{
+int PUMulti::length() {
     return queue.getLength();
 }
 
-void PUMulti::arrival(MultiJob *job)
-{
+void PUMulti::arrival(MultiJob *job) {
     job->setTimestamp();
 }
 
-void PUMulti::startService(MultiJob *job)
-{
+void PUMulti::startService(MultiJob *job) {
     // gather queueing time statistics
     simtime_t d = simTime() - job->getTimestamp();
     emit(queueingTimeSignal, d);
@@ -118,15 +109,14 @@ void PUMulti::startService(MultiJob *job)
     job->setTimestamp();
     // get service time
     int nservice=job->getServiceCount();
-    simtime_t serviceTime=job->getSuggestedTime(nservice);
+    simtime_t serviceTime=job->getSuggestedTime(nservice)/speedup;
     scheduleAt(simTime()+serviceTime, endServiceMsg);
     if (job->getSlaDeadline()>0){
         scheduleAt(job->getSlaDeadline(), timeoutMsg);
     }
 }
 
-void PUMulti::endService(MultiJob *job)
-{
+void PUMulti::endService(MultiJob *job) {
     EV << "Finishing service of " << job->getName() << endl;
     simtime_t d = simTime() - job->getTimestamp();
     job->setServiceTime(job->getServiceTime() + d);
@@ -134,8 +124,7 @@ void PUMulti::endService(MultiJob *job)
     send(job, "out");
 }
 
-void PUMulti::abortService(MultiJob *job)
-{
+void PUMulti::abortService(MultiJob *job) {
     EV << "Timout for " << job->getName() << endl;
     if (hasGUI())
         bubble("Dropped!");
@@ -145,8 +134,7 @@ void PUMulti::abortService(MultiJob *job)
 }
 
 
-void PUMulti::finish()
-{
+void PUMulti::finish(){
 }
 
 }; //namespace
