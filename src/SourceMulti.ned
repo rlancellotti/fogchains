@@ -38,9 +38,9 @@ simple SourceMulti
         volatile double suggestedTime_7 @unit(s) = default(1s);
         volatile double suggestedTime_8 @unit(s) = default(1s);
         volatile double suggestedTime_9 @unit(s) = default(1s);
-        // exit link after each service. Only #0 is shown
-        // int x means go to exit X
-        // -1 means remain on same node
+        // exit link after each service.
+        // int x means go to PU x
+        // -1 means exit to sink
         int output_0 = default(-1); 
         int output_1 = default(-1); 
         int output_2 = default(-1); 
