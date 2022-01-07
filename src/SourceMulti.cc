@@ -55,14 +55,17 @@ void SourceMulti::handleMessage(cMessage *msg)
     job->setDelayTime(0.0);
     job->setQueueCount(0);
     job->setDelayCount(0);
-    //FIXME: use parameter
     job->setAppId(par("appId").intValue());
     int chainLenght=par("chainLenght").intValue();
-    job->setSuggestedTimeArraySize(chainLenght); 
-    job->setOutputsArraySize(chainLenght); 
-    for (int i=0; i<chainLenght; i++){
-        std::string partimename = "suggestedTime_" + std::to_string(i);
-        job->setSuggestedTime(i, par(partimename.c_str()));
+    job->setSuggestedTimeArraySize(chainLenght+1); 
+    job->setOutputsArraySize(chainLenght+1); 
+    for (int i=0; i<chainLenght+1; i++){
+        if (i>0) {
+            std::string partimename = "suggestedTime_" + std::to_string(i);
+            job->setSuggestedTime(i, par(partimename.c_str()));
+        } else {
+            job->setSuggestedTime(i, 0.0);
+        }
         std::string paroutname = "output_" + std::to_string(i);
         job->setOutputs(i, par(paroutname.c_str()).intValue());
     }

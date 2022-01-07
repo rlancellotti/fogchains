@@ -28,7 +28,6 @@ simple SourceMulti
         int chainLenght=default(1);
         // FIXME: should fine bettere way to describe properties
         // list of service times for the services. 
-        volatile double suggestedTime_0 @unit(s) = default(1s);
         volatile double suggestedTime_1 @unit(s) = default(1s);
         volatile double suggestedTime_2 @unit(s) = default(1s);
         volatile double suggestedTime_3 @unit(s) = default(1s);
@@ -41,7 +40,8 @@ simple SourceMulti
         // exit link after each service.
         // int x means go to PU x
         // -1 means exit to sink
-        int output_0 = default(-1); 
+        // output_0 is the number of the first PU (from sources)
+        int output_0 = default(-1);
         int output_1 = default(-1); 
         int output_2 = default(-1); 
         int output_3 = default(-1); 
