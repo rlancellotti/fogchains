@@ -38,12 +38,12 @@ network FogChain
             parameters:
                 @display("i=,slategray");
             gates:
-                out[nNodes];
+                out[parent.nNodes];
         };
         pu[nNodes]: PUMulti;
         dispatcher[nNodes]: DispatcherMulti {
             gates:
-                out[nNodes];
+                out[parent.nNodes];
         };
         classifier: AppClassifier;
         sink[nChains]: SinkMulti;
