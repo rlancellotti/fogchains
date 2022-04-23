@@ -32,10 +32,12 @@ SourceMulti::~SourceMulti()
 
 void SourceMulti::initialize()
 {
+    startTime = par("startTime");
+    stopTime = par("stopTime");
     timerMessage = new cMessage("timer");
     maxInterval = par("maxInterval");
     sentJobSignal = registerSignal("sentJob");
-    scheduleAt(simTime(), timerMessage);
+    scheduleAt(startTime, timerMessage);
 }
 
 /**
@@ -47,6 +49,10 @@ void SourceMulti::handleMessage(cMessage *msg)
 {
     ASSERT(msg==timerMessage);
     simtime_t t, trand;
+    // stop condition
+    if (stopTime >= 0 && stopTime < simTime()) {
+        return;
+    }
     // create new message
     MultiJob *job = new MultiJob(getJobName());
     job->setStartTime(simTime());

@@ -29,6 +29,8 @@ class SourceMulti : public cSimpleModule
   private:
     cMessage *timerMessage;
     simtime_t maxInterval;
+    simtime_t startTime;
+    simtime_t stopTime;
     simsignal_t sentJobSignal;
 
   public:

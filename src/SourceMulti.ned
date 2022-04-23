@@ -25,6 +25,8 @@ simple SourceMulti
         @signal[sentJob](type="long");
         @statistic[sentJob](title="sent event";record=vector?,count;interpolationmode=none);
         volatile double sendInterval @unit(s) = default(exponential(1s));
+        double startTime @unit(s) = default(sendInterval);
+        double stopTime @unit(s) = default(-1s);
         int chainLenght=default(1);
         // FIXME: should fine bettere way to describe properties
         // list of service times for the services. 
