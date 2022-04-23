@@ -51,6 +51,17 @@ simple SourceMulti
         int output_7 = default(-1); 
         int output_8 = default(-1); 
         int output_9 = default(-1); 
+        // exit probability after each service.
+        // should be float in range [0,1]
+        int exitProbability_1 = default(-1); 
+        int exitProbability_2 = default(-1); 
+        int exitProbability_3 = default(-1); 
+        int exitProbability_4 = default(-1); 
+        int exitProbability_5 = default(-1); 
+        int exitProbability_6 = default(-1); 
+        int exitProbability_7 = default(-1); 
+        int exitProbability_8 = default(-1); 
+        int exitProbability_9 = default(-1); 
         double suggestedDeadline @unit(s) = default(-1s);
         double maxInterval @unit(s) = default(-1s);
         int appId = default(1);
