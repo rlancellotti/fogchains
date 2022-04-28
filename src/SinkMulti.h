@@ -19,6 +19,7 @@ class SinkMulti : public cSimpleModule
 	simsignal_t totalServiceTimeSignal;
 	simsignal_t totalDelayTimeSignal;
 	simsignal_t delaysVisitedSignal;
+	simsignal_t earlyExit;
 	//simsignal_t generationSignal;
 	
     //bool keepJobs;

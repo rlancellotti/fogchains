@@ -72,7 +72,7 @@ void SourceMulti::handleMessage(cMessage *msg)
             std::string partimename = "suggestedTime_" + std::to_string(i);
             job->setSuggestedTime(i, par(partimename.c_str()));
             std::string parexitname = "exitProbability_" + std::to_string(i);
-            job->setExitProbability(i, par(parexitname.c_str()).intValue());
+            job->setExitProbability(i, par(parexitname.c_str()));
         } else {
             job->setSuggestedTime(i, 0.0);
             job->setExitProbability(i, 0.0);

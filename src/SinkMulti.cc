@@ -13,6 +13,7 @@ void SinkMulti::initialize()
     totalServiceTimeSignal = registerSignal("totalServiceTime");
     totalDelayTimeSignal = registerSignal("totalDelayTime");
     delaysVisitedSignal = registerSignal("delaysVisited");
+    earlyExit = registerSignal("earlyExit");
 
     //generationSignal = registerSignal("generation");
     //keepJobs = par("keepJobs");
@@ -29,6 +30,9 @@ void SinkMulti::handleMessage(cMessage *msg)
     emit(totalServiceTimeSignal, job->getServiceTime());
     emit(totalDelayTimeSignal, job->getDelayTime());
     emit(delaysVisitedSignal, job->getDelayCount());
+    if (job->getLastService()>=0){
+        emit (earlyExit, job->getLastService());
+    }
     delete msg;
 }
 

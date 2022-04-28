@@ -29,13 +29,15 @@ simple SinkMulti
         @signal[totalServiceTime](type="simtime_t");
         @signal[queuesVisited](type="long");
         @signal[delaysVisited](type="long");
+        @signal[earlyExit](type="long");
 
-        @statistic[responseTime](title="lifetime of arrived jobs";unit=s;record=vector?,stats;interpolationmode=none);
+        @statistic[responseTime](title="lifetime of arrived jobs";unit=s;record=vector?,stats,histogram;interpolationmode=none);
         @statistic[totalQueueingTime](title="the total time spent in queues by arrived jobs";unit=s;record=vector?,stats;interpolationmode=none);
         @statistic[totalDelayTime](title="the total time spent in delay nodes by arrived jobs";unit=s;record=vector?,stats;interpolationmode=none);
         @statistic[totalServiceTime](title="the total time spent being processed by arrived jobs";unit=s;record=vector?,stats;interpolationmode=none);
         @statistic[queuesVisited](title="the total number of queues visited by arrived jobs";record=vector?,stats;interpolationmode=none);
         @statistic[delaysVisited](title="the total number of delays visited by arrived jobs";record=vector?,stats;interpolationmode=none);
+        @statistic[earlyExit](title="the total number of delays visited by arrived jobs";record=vector?,stats,histogram;interpolationmode=none);
     gates:
         input in[];
 }

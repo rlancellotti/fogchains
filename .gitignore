@@ -10,6 +10,7 @@
 *_m.cc
 *_m.h
 *.db
+*.d
 fogchains
 fogchains_dbg
 out/*
@@ -30,3 +31,4 @@ simulations/analysis
 simulations/*.json
 simulations/*.ini
 .vscode/*
+*.code-workspace

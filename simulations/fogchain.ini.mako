@@ -15,6 +15,7 @@ repeat = 1
 [Config FogChainTest1]
 **.vector-recording = false
 **.sink.responseTime.result-recording-modes = +histogram
+**.sink.earlyExit.result-recording-modes = +histogram
 **.nChains=${len(sol['servicechain'])}
 **.nNodes=${len(sol['fog'])}
 
@@ -34,6 +35,7 @@ repeat = 1
 **.source[${i}].suggestedTime_${j+1} = 1s * truncnormal(\
 ${sol['servicechain'][c]['services'][m]['meanserv']}, \
 ${sol['servicechain'][c]['services'][m]['stddevserv']}) # ${m}
+**.source[${i}].exitProbability_${j+1} = 0.0
 %endfor
 **.source[${i}].output_${len(sol['servicechain'][c]['services'])} = -1
 

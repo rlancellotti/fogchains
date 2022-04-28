@@ -9,7 +9,7 @@ packet MultiJob
     simtime_t slaDeadline;      // deadline for SLA (-1 for no deadline)
 	simtime_t suggestedTime[];  // suggested service time. Array of values
     int outputs[];				// IDs of the output routes traversed
-    float exitProbability[];    // probability of ending chain after i-th service.
+    double exitProbability[];    // probability of ending chain after i-th service.
     int lastService;            // last service visited in case of early exit (-1 otherwise)
     int appId;                  // ID of the application (service chain)
     int serviceCount;           // the number of services traversed by the job
