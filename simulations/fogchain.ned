@@ -33,7 +33,7 @@ network FogChain
         int nNodes;
     submodules:
         source[nChains]: SourceMulti;
-        //delay[nNodes * nNodes]: DelayMulti;
+        delay[nNodes * nNodes]: DelayMulti;
         initDispatcher[nChains]: DispatcherMulti {
             parameters:
                 @display("i=,slategray");
@@ -65,9 +65,9 @@ network FogChain
         }
         // interconnection among dispatchers
         for d=0..nNodes-1, for p=0..nNodes-1 {
-            dispatcher[d].out[p] --> pu[p].in++;
-            //dispatcher[d].out[p] --> delay[d*nNodes+p].in++;
-            //delay[d*nNodes+p].out --> pu[p].in++;
+            //dispatcher[d].out[p] --> pu[p].in++;
+            dispatcher[d].out[p] --> delay[d*nNodes+p].in++;
+            delay[d*nNodes+p].out --> pu[p].in++;
         } 
         // output of dispatchers towards sink
         for i=0..nNodes-1 {

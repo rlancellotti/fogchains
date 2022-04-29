@@ -14,8 +14,6 @@ repeat = 1
 
 [Config FogChainTest1]
 **.vector-recording = false
-**.sink.responseTime.result-recording-modes = +histogram
-**.sink.earlyExit.result-recording-modes = +histogram
 **.nChains=${len(sol['servicechain'])}
 **.nNodes=${len(sol['fog'])}
 
@@ -27,6 +25,8 @@ repeat = 1
 
 %for i, c in enumerate(sol['servicechain']):
 # Service chain ${c}
+#**.source[${i}].startTime = 10s
+#**.source[${i}].stopTime = 100s
 **.source[${i}].appId = ${i+1}
 **.source[${i}].sendInterval = exponential(1s * ${1.0/sol['servicechain'][c]['lambda']})
 **.source[${i}].chainLenght = ${len(sol['servicechain'][c]['services'])}
@@ -40,4 +40,9 @@ ${sol['servicechain'][c]['services'][m]['stddevserv']}) # ${m}
 **.source[${i}].output_${len(sol['servicechain'][c]['services'])} = -1
 
 %endfor
-#**.delay.delay = exponential(0.5s)
+%if 'network' in sol.keys():
+# FIXME: must be implemented
+**.delay[*].delay = exponential(0.5s)
+%else:
+**.delay[*].delay = 0.5s
+%endif
