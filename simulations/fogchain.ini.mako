@@ -16,6 +16,7 @@ repeat = 1
 **.vector-recording = false
 **.nChains=${len(sol['servicechain'])}
 **.nNodes=${len(sol['fog'])}
+**.networkDelay=${'true' if 'network' in sol.keys() else 'false'}
 
 # Fog nodes
 %for i, f in enumerate(sol['fog']):
@@ -43,6 +44,4 @@ ${sol['servicechain'][c]['services'][m]['stddevserv']}) # ${m}
 %if 'network' in sol.keys():
 # FIXME: must be implemented
 **.delay[*].delay = exponential(0.5s)
-%else:
-**.delay[*].delay = 0.5s
 %endif
