@@ -34,20 +34,31 @@ network FogChain
         bool networkDelay = default(false);
     submodules:
         source[nChains]: SourceMulti;
-        delay[nNodes * nNodes]: DelayMulti if networkDelay;
+        delay[nNodes * nNodes]: DelayMulti if networkDelay {
+            parameters:
+                @display("p=,,c;is=vs");
+        };
         initDispatcher[nChains]: DispatcherMulti {
             parameters:
-                @display("i=,slategray");
+                @display("p=,,c;i=,slategray");
             gates:
                 out[parent.nNodes];
         };
-        pu[nNodes]: PUMulti;
+        pu[nNodes]: PUMulti {
+            parameters:
+                @display("p=,,c");
+        };
         dispatcher[nNodes]: DispatcherMulti {
+            parameters:
+                @display("p=,,c");
             gates:
                 out[parent.nNodes];
         };
         classifier: AppClassifier;
-        sink[nChains]: SinkMulti;
+        sink[nChains]: SinkMulti{
+            parameters:
+                @display("p=,,c");
+        };
         sinkmisc: SinkMulti;
     connections:
         // link source to first level of dispatchers

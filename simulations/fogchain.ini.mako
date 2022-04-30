@@ -1,9 +1,6 @@
 <%
-# import solution file
 import json
-with open('sample_output.json') as f:
-    sol=json.load(f)
-foglookup={}
+files = ['sample_output.json', 'output_nfog3_run0.json']
 %>\
 [General]
 network = FogChain
@@ -12,10 +9,19 @@ cmdenv-config-name = FogChain
 qtenv-default-config = FogChain
 repeat = 1
 
-[Config FogChainTest1]
+%for fname in files:
+[Config ${fname.removesuffix('.json')}]
+<%
+# import solution file
+with open(fname) as f:
+    sol=json.load(f)
+foglookup={}
+nnodes=len(sol['fog'])
+nchains=len(sol['servicechain'])
+%>\
 **.vector-recording = false
-**.nChains=${len(sol['servicechain'])}
-**.nNodes=${len(sol['fog'])}
+**.nChains=${nchains}
+**.nNodes=${nnodes}
 **.networkDelay=${'true' if 'network' in sol.keys() else 'false'}
 
 # Fog nodes
@@ -42,6 +48,12 @@ ${sol['servicechain'][c]['services'][m]['stddevserv']}) # ${m}
 
 %endfor
 %if 'network' in sol.keys():
-# FIXME: must be implemented
-**.delay[*].delay = exponential(0.5s)
+#**.delay[*].delay = exponential(0.5s)
+%for s, row in enumerate(sol['network']):
+%for d, delay in enumerate(row):
+**.delay[${s*nnodes+d}].delay = 1s * truncnormal(${delay}, ${0.05 * delay}) # delay ${s} -> ${d}
+%endfor
+%endfor
 %endif
+
+%endfor
