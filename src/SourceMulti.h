@@ -41,6 +41,7 @@ class SourceMulti : public cSimpleModule
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+    virtual void scheduleJob(simtime_t offset);
 };
 
 }; // namespace

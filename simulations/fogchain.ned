@@ -31,9 +31,11 @@ network FogChain
     parameters:
         int nChains;
         int nNodes;
+        int nSrcPerChain = default(1);
         bool networkDelay = default(false);
+        //string pustring=choose(int(networkDelay), "p=,,c p=,,ri");
     submodules:
-        source[nChains]: SourceMulti;
+        source[nChains*nSrcPerChain]: SourceMulti;
         delay[nNodes * nNodes]: DelayMulti if networkDelay {
             parameters:
                 @display("p=,,c;is=vs");
@@ -47,6 +49,7 @@ network FogChain
         pu[nNodes]: PUMulti {
             parameters:
                 @display("p=,,c");
+                //pudisplay = parent.networkDelay?",,c":",,ri";
         };
         dispatcher[nNodes]: DispatcherMulti {
             parameters:

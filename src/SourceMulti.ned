@@ -25,7 +25,10 @@ simple SourceMulti
         @signal[sentJob](type="long");
         @statistic[sentJob](title="sent event";record=vector?,count;interpolationmode=none);
         volatile double sendInterval @unit(s) = default(exponential(1s));
-        double startTime @unit(s) = default(sendInterval);
+        // startTime=0 -> start at beginning (with a tink time)
+        // startTime<0 -> don't start at all
+        double startTime @unit(s) = default(0s);
+        // stopTime<0 -> stop at simulation end
         double stopTime @unit(s) = default(-1s);
         int chainLenght=default(1);
         // FIXME: should fine bettere way to describe properties

@@ -37,7 +37,9 @@ void SourceMulti::initialize()
     timerMessage = new cMessage("timer");
     maxInterval = par("maxInterval");
     sentJobSignal = registerSignal("sentJob");
-    scheduleAt(startTime, timerMessage);
+    if (startTime>=0) {
+        scheduleJob(startTime);
+    }
 }
 
 /**
@@ -48,7 +50,6 @@ void SourceMulti::initialize()
 void SourceMulti::handleMessage(cMessage *msg)
 {
     ASSERT(msg==timerMessage);
-    simtime_t t, trand;
     // stop condition
     if (stopTime >= 0 && stopTime < simTime()) {
         return;
@@ -89,15 +90,17 @@ void SourceMulti::handleMessage(cMessage *msg)
     //EV << "ID is: "<< job->getId() <<endl;
     //job->setId(nextJobId++);
     send(job, "out");
-    // schedule next message
-    trand=par("sendInterval");
-    if (maxInterval>0 && trand>maxInterval){
-        t=simTime() + maxInterval;
-    } else {
-        t=simTime() + trand;
-    }
     emit(sentJobSignal, 1);
+    // schedule next message
+    scheduleJob(simTime());
+}
+
+void SourceMulti::scheduleJob(simtime_t offset){
+    simtime_t t, trand;
+    trand=par("sendInterval");
+    t=(maxInterval>0 && trand>maxInterval)?t=offset + maxInterval:t=offset + trand;
     scheduleAt(t, timerMessage);
+
 }
 
 const char *SourceMulti::getJobName(){
