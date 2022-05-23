@@ -7,14 +7,14 @@
 // `license' for details on this and other legal matters.
 //
 
-#include "DelayMulti.h"
-#include "MultiJob_m.h"
+#include "DelayChain.h"
+#include "ChainJob_m.h"
 
 namespace fog {
 
-Define_Module(DelayMulti);
+Define_Module(DelayChain);
 
-void DelayMulti::initialize()
+void DelayChain::initialize()
 {
     currentlyStored = 0;
     delayedJobsSignal = registerSignal("delayedJobs");
@@ -22,9 +22,9 @@ void DelayMulti::initialize()
     WATCH(currentlyStored);
 }
 
-void DelayMulti::handleMessage(cMessage *msg)
+void DelayChain::handleMessage(cMessage *msg)
 {
-    MultiJob *job = check_and_cast<MultiJob *>(msg);
+    ChainJob *job = check_and_cast<ChainJob *>(msg);
 
     if (!job->isSelfMessage()) {
         // if it is not a self-message, send it to ourselves with a delay
@@ -45,7 +45,7 @@ void DelayMulti::handleMessage(cMessage *msg)
 
 }
 
-void DelayMulti::refreshDisplay() const
+void DelayChain::refreshDisplay() const
 {
     getDisplayString().setTagArg("i", 1, currentlyStored == 0 ? "" : "cyan");
 }

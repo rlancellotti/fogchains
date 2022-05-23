@@ -1,15 +1,15 @@
-#include "MultiJob_m.h"
-#include "DispatcherMulti.h"
+#include "ChainJob_m.h"
+#include "DispatcherChain.h"
 
 namespace fog {
 
-Define_Module(DispatcherMulti);
+Define_Module(DispatcherChain);
 
-void DispatcherMulti::initialize() {
+void DispatcherChain::initialize() {
 }
 
-void DispatcherMulti::handleMessage(cMessage *msg) {
-    MultiJob *job = check_and_cast<MultiJob *>(msg);
+void DispatcherChain::handleMessage(cMessage *msg) {
+    ChainJob *job = check_and_cast<ChainJob *>(msg);
     // check if job must exit
     float exitProbability=job->getExitProbability(job->getServiceCount());
     if (uniform(0.0,1.0)< exitProbability){
@@ -29,7 +29,7 @@ void DispatcherMulti::handleMessage(cMessage *msg) {
     }
 }
 
-void DispatcherMulti::finish() {
+void DispatcherChain::finish() {
 }
 
 }; //namespace

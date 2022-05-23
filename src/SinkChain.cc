@@ -1,11 +1,11 @@
-#include "MultiJob_m.h"
-#include "SinkMulti.h"
+#include "ChainJob_m.h"
+#include "SinkChain.h"
 
 namespace fog {
 
-Define_Module(SinkMulti);
+Define_Module(SinkChain);
 
-void SinkMulti::initialize()
+void SinkChain::initialize()
 {
     responseTimeSignal = registerSignal("responseTime");
     totalQueueingTimeSignal = registerSignal("totalQueueingTime");
@@ -19,9 +19,9 @@ void SinkMulti::initialize()
     //keepJobs = par("keepJobs");
 }
 
-void SinkMulti::handleMessage(cMessage *msg)
+void SinkChain::handleMessage(cMessage *msg)
 {
-    MultiJob *job = check_and_cast<MultiJob *>(msg);
+    ChainJob *job = check_and_cast<ChainJob *>(msg);
 
     // gather statistics
     emit(responseTimeSignal, simTime()- job->getCreationTime());
@@ -36,7 +36,7 @@ void SinkMulti::handleMessage(cMessage *msg)
     delete msg;
 }
 
-void SinkMulti::finish()
+void SinkChain::finish()
 {
     // TODO missing scalar statistics
 }

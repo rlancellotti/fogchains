@@ -13,24 +13,24 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "SourceMulti.h"
-#include "MultiJob_m.h"
+#include "SourceChain.h"
+#include "ChainJob_m.h"
 
 namespace fog {
 
-Define_Module(SourceMulti);
+Define_Module(SourceChain);
 
-SourceMulti::SourceMulti()
+SourceChain::SourceChain()
 {
     timerMessage = NULL;
 }
 
-SourceMulti::~SourceMulti()
+SourceChain::~SourceChain()
 {
     cancelAndDelete(timerMessage);
 }
 
-void SourceMulti::initialize()
+void SourceChain::initialize()
 {
     startTime = par("startTime");
     stopTime = par("stopTime");
@@ -47,7 +47,7 @@ void SourceMulti::initialize()
  * Next timer is scheduled
  */
 
-void SourceMulti::handleMessage(cMessage *msg)
+void SourceChain::handleMessage(cMessage *msg)
 {
     ASSERT(msg==timerMessage);
     // stop condition
@@ -55,7 +55,7 @@ void SourceMulti::handleMessage(cMessage *msg)
         return;
     }
     // create new message
-    MultiJob *job = new MultiJob(getJobName());
+    ChainJob *job = new ChainJob(getJobName());
     job->setStartTime(simTime());
     job->setQueuingTime(0.0);
     job->setServiceTime(0.0);
@@ -95,7 +95,7 @@ void SourceMulti::handleMessage(cMessage *msg)
     scheduleJob(simTime());
 }
 
-void SourceMulti::scheduleJob(simtime_t offset){
+void SourceChain::scheduleJob(simtime_t offset){
     simtime_t t, trand;
     trand=par("sendInterval");
     t=(maxInterval>0 && trand>maxInterval)?t=offset + maxInterval:t=offset + trand;
@@ -103,7 +103,7 @@ void SourceMulti::scheduleJob(simtime_t offset){
 
 }
 
-const char *SourceMulti::getJobName(){
+const char *SourceChain::getJobName(){
     return par("jobName");
 }
 

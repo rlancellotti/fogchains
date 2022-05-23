@@ -15,11 +15,11 @@
 
 package fog.simulations;
 
-import fog.SourceMulti;
-import fog.SinkMulti;
-import fog.DelayMulti;
-import fog.PUMulti;
-import fog.DispatcherMulti;
+import fog.SourceChain;
+import fog.SinkChain;
+import fog.DelayChain;
+import fog.PUChain;
+import fog.DispatcherChain;
 import fog.AppClassifier;
 
 
@@ -35,34 +35,34 @@ network FogChain
         bool networkDelay = default(false);
         //string pustring=choose(int(networkDelay), "p=,,c p=,,ri");
     submodules:
-        source[nChains*nSrcPerChain]: SourceMulti;
-        delay[nNodes * nNodes]: DelayMulti if networkDelay {
+        source[nChains*nSrcPerChain]: SourceChain;
+        delay[nNodes * nNodes]: DelayChain if networkDelay {
             parameters:
                 @display("p=,,c;is=vs");
         };
-        initDispatcher[nChains]: DispatcherMulti {
+        initDispatcher[nChains]: DispatcherChain {
             parameters:
                 @display("p=,,c;i=,slategray");
             gates:
                 out[parent.nNodes];
         };
-        pu[nNodes]: PUMulti {
+        pu[nNodes]: PUChain {
             parameters:
                 @display("p=,,c");
                 //pudisplay = parent.networkDelay?",,c":",,ri";
         };
-        dispatcher[nNodes]: DispatcherMulti {
+        dispatcher[nNodes]: DispatcherChain {
             parameters:
                 @display("p=,,c");
             gates:
                 out[parent.nNodes];
         };
         classifier: AppClassifier;
-        sink[nChains]: SinkMulti{
+        sink[nChains]: SinkChain{
             parameters:
                 @display("p=,,c");
         };
-        sinkmisc: SinkMulti;
+        sinkmisc: SinkChain;
     connections:
         // link source to first level of dispatchers
         for i=0..nChains-1 {

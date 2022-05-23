@@ -18,7 +18,7 @@ package fog;
 //
 // Generates messages with a configurable interarrival time.
 //
-simple SourceMulti
+simple SourceChain
 {
     parameters:
         @display("i=block/source");

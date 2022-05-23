@@ -1,5 +1,5 @@
-#ifndef __FOG_SINKMULTI_H
-#define __FOG_SINKMULTI_H
+#ifndef __FOG_SINKCHAIN_H
+#define __FOG_SINKCHAIN_H
 
 #include <omnetpp.h>
 
@@ -10,7 +10,7 @@ namespace fog {
 /**
  * Consumes jobs; see NED file for more info.
  */
-class SinkMulti : public cSimpleModule
+class SinkChain : public cSimpleModule
 {
   private:
 	simsignal_t responseTimeSignal;

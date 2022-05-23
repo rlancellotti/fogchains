@@ -4,14 +4,14 @@ package fog;
 //
 // processing unit with a queue
 //
-simple PUMulti
+simple PUChain
 {
     parameters:
         @display("i=block/activeq;q=queue");
         @signal[dropped](type="long");
         @signal[queueLength](type="long");
         @signal[queueingTime](type="simtime_t");
-        @signal[busy](type="bool");
+        @signal[busy](type="int");
         @statistic[dropped](title="drop event";record=vector?,count;interpolationmode=none);
         @statistic[queueLength](title="queue length";record=vector,timeavg,max;interpolationmode=sample-hold);
         @statistic[queueingTime](title="queueing time";record=vector?,mean,max;unit=s;interpolationmode=none);

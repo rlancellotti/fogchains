@@ -4,7 +4,7 @@ package fog;
 //
 // dispatcher: sends jobs to next PU in queue
 //
-simple DispatcherMulti
+simple DispatcherChain
 {
     parameters:
         @display("i=block/dispatch");    

@@ -1,6 +1,6 @@
 package fog;
 
-simple DelayMulti
+simple DelayChain
 {
     parameters:
         @signal[delayedJobs](type="long");

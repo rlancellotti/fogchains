@@ -7,25 +7,25 @@
 // `license' for details on this and other legal matters.
 //
 
-#include "PUMulti.h"
+#include "PUChain.h"
 
 namespace fog {
 
-Define_Module(PUMulti);
+Define_Module(PUChain);
 
-PUMulti::PUMulti() {
+PUChain::PUChain() {
     jobServiced = nullptr;
     endServiceMsg = nullptr;
     timeoutMsg = nullptr;
 }
 
-PUMulti::~PUMulti() {
+PUChain::~PUChain() {
     delete jobServiced;
     cancelAndDelete(endServiceMsg);
     cancelAndDelete(timeoutMsg);
 }
 
-void PUMulti::initialize() {
+void PUChain::initialize() {
     droppedSignal = registerSignal("dropped");
     queueingTimeSignal = registerSignal("queueingTime");
     queueLengthSignal = registerSignal("queueLength");
@@ -39,7 +39,7 @@ void PUMulti::initialize() {
     queue.setName("queue");
 }
 
-void PUMulti::handleMessage(cMessage *msg) {
+void PUChain::handleMessage(cMessage *msg) {
     // End Service or Timeout
     if (msg == endServiceMsg || msg == timeoutMsg) {
         if (msg == endServiceMsg){
@@ -59,7 +59,7 @@ void PUMulti::handleMessage(cMessage *msg) {
         return;
     }
     // New job
-    MultiJob *job = check_and_cast<MultiJob *>(msg);
+    ChainJob *job = check_and_cast<ChainJob *>(msg);
     arrival(job);
     if (!jobServiced) {
         // processor was idle
@@ -83,24 +83,24 @@ void PUMulti::handleMessage(cMessage *msg) {
     }
 }
 
-void PUMulti::refreshDisplay() const {
+void PUChain::refreshDisplay() const {
     getDisplayString().setTagArg("i2", 0, jobServiced ? "status/execute" : "");
     getDisplayString().setTagArg("i", 1, queue.isEmpty() ? "" : "cyan");
 }
 
-MultiJob *PUMulti::getFromQueue() {
-    return (MultiJob *)queue.pop();
+ChainJob *PUChain::getFromQueue() {
+    return (ChainJob *)queue.pop();
 }
 
-int PUMulti::length() {
+int PUChain::length() {
     return queue.getLength();
 }
 
-void PUMulti::arrival(MultiJob *job) {
+void PUChain::arrival(ChainJob *job) {
     job->setTimestamp();
 }
 
-void PUMulti::startService(MultiJob *job) {
+void PUChain::startService(ChainJob *job) {
     // gather queueing time statistics
     simtime_t d = simTime() - job->getTimestamp();
     emit(queueingTimeSignal, d);
@@ -116,7 +116,7 @@ void PUMulti::startService(MultiJob *job) {
     }
 }
 
-void PUMulti::endService(MultiJob *job) {
+void PUChain::endService(ChainJob *job) {
     EV << "Finishing service of " << job->getName() << endl;
     simtime_t d = simTime() - job->getTimestamp();
     job->setServiceTime(job->getServiceTime() + d);
@@ -124,7 +124,7 @@ void PUMulti::endService(MultiJob *job) {
     send(job, "out");
 }
 
-void PUMulti::abortService(MultiJob *job) {
+void PUChain::abortService(ChainJob *job) {
     EV << "Timout for " << job->getName() << endl;
     if (hasGUI())
         bubble("Dropped!");
@@ -134,7 +134,7 @@ void PUMulti::abortService(MultiJob *job) {
 }
 
 
-void PUMulti::finish(){
+void PUChain::finish(){
 }
 
 }; //namespace

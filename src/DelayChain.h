@@ -7,11 +7,11 @@
 // `license' for details on this and other legal matters.
 //
 
-#ifndef __DELAYMULTI_H
-#define __DELAYMULTI_H
+#ifndef __DELAYCHAIN_H
+#define __DELAYCHAIN_H
 
 #include <omnetpp.h>
-#include "MultiJob_m.h"
+#include "ChainJob_m.h"
 
 using namespace omnetpp;
 
@@ -20,7 +20,7 @@ namespace fog {
 /**
  * Delays the incoming messages
  */
-class DelayMulti : public cSimpleModule
+class DelayChain : public cSimpleModule
 {
     private:
 		simsignal_t delayedJobsSignal;

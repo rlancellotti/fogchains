@@ -7,11 +7,11 @@
 // `license' for details on this and other legal matters.
 //
 
-#ifndef __FOGNODEMULTI_H
-#define __FOGNODEMULTI_H
+#ifndef __FOGPUCHAIN_H
+#define __FOGPUCHAIN_H
 
 #include <omnetpp.h>
-#include "MultiJob_m.h"
+#include "ChainJob_m.h"
 
 using namespace omnetpp;
 
@@ -24,7 +24,7 @@ TODO:
 
 namespace fog {
 
-class PUMulti : public cSimpleModule
+class PUChain : public cSimpleModule
 {
     private:
 		simsignal_t droppedSignal;
@@ -32,29 +32,29 @@ class PUMulti : public cSimpleModule
 		simsignal_t queueingTimeSignal;
 		simsignal_t busySignal;
 
-        MultiJob *jobServiced;
+        ChainJob *jobServiced;
         cMessage *endServiceMsg;
         cMessage *timeoutMsg;
         cQueue queue;
         int capacity;
         double speedup;
-        MultiJob *getFromQueue();
 
     public:
-        PUMulti();
-        virtual ~PUMulti();
+        PUChain();
+        virtual ~PUChain();
         int length();
 
     protected:
+        virtual ChainJob *getFromQueue();
         virtual void initialize() override;
         virtual void handleMessage(cMessage *msg) override;
         virtual void refreshDisplay() const override;
         virtual void finish() override;
 
-        virtual void arrival(MultiJob *job);
-        virtual void startService(MultiJob *job);
-        virtual void endService(MultiJob *job);
-        virtual void abortService(MultiJob *job);
+        virtual void arrival(ChainJob *job);
+        virtual void startService(ChainJob *job);
+        virtual void endService(ChainJob *job);
+        virtual void abortService(ChainJob *job);
 };
 
 }; //namespace

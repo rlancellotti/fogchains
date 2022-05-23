@@ -13,8 +13,8 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef __SOURCEMULTI_H
-#define __SOURCEMULTI_H
+#ifndef __SOURCECHAIN_H
+#define __SOURCECHAIN_H
 
 #include <omnetpp.h>
 using namespace omnetpp;
@@ -24,7 +24,7 @@ namespace fog {
 /**
  * Generates messages; see NED file for more info.
  */
-class SourceMulti : public cSimpleModule
+class SourceChain : public cSimpleModule
 {
   private:
     cMessage *timerMessage;
@@ -34,8 +34,8 @@ class SourceMulti : public cSimpleModule
     simsignal_t sentJobSignal;
 
   public:
-     SourceMulti();
-     virtual ~SourceMulti();
+     SourceChain();
+     virtual ~SourceChain();
      const char *getJobName();
 
   protected:

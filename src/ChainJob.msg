@@ -3,7 +3,7 @@ namespace fog;
 //
 // Multi-Service Job message definition
 //
-packet MultiJob
+packet ChainJob
 {
     simtime_t startTime;        // time the message is sent
     simtime_t slaDeadline;      // deadline for SLA (-1 for no deadline)
