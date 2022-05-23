@@ -42,7 +42,7 @@ class PUChainMCore : public PUChain
         cQueue queue;
         int capacity;
         int ncores;
-        int lastUsedPU;
+        int lastUsedCore;
         double speedup;
 
         int getBusyCores() const;
@@ -64,6 +64,7 @@ class PUChainMCore : public PUChain
         virtual void setFreeCore(int coreID);
         virtual void setBusyCore(int coreID);
         virtual void setCoreStatus(int coreID, bool busy);
+        virtual int getBestCore();
 
 
         //virtual void arrival(ChainJob *job) override;

@@ -42,7 +42,7 @@ void PUChainMCore::initialize() {
         timeoutMsg[i]=new cMessage("timeout");
         busyCore[i]=false;
     }
-    lastUsedPU=0;
+    lastUsedCore=0;
     capacity = par("capacity");
     queue.setName("queue");
 }
@@ -99,13 +99,11 @@ void PUChainMCore::handleMessage(cMessage *msg) {
         return;
     }
     // New job
-    /*ChainJob *job = check_and_cast<ChainJob *>(msg);
+    ChainJob *job = check_and_cast<ChainJob *>(msg);
     arrival(job);
-    if (!jobServiced) {
-        // processor was idle
-        jobServiced = job;
-        emit(busySignal, true);
-        startService(jobServiced);
+    if (getBusyCores()<ncores) {
+        // there is an idle core
+        startService(job);
     }
     else {
         // check for container capacity
@@ -120,7 +118,7 @@ void PUChainMCore::handleMessage(cMessage *msg) {
         queue.insert(job);
         emit(queueLengthSignal, length());
         job->setQueueCount(job->getQueueCount() + 1);
-    }*/
+    }
 }
 
 void PUChainMCore::refreshDisplay() const {
@@ -128,6 +126,7 @@ void PUChainMCore::refreshDisplay() const {
     getDisplayString().setTagArg("i", 1, queue.isEmpty() ? "" : "cyan");
 }
 
+/*same as superclass, no need to redefine it*/
 /*void PUChainMCore::arrival(ChainJob *job) {
     job->setTimestamp();
 }*/
@@ -139,14 +138,25 @@ void PUChainMCore::startService(ChainJob *job) {
     job->setQueuingTime(job->getQueuingTime() + d);
     EV << "Starting service of " << job->getName() << endl;
     job->setTimestamp();
-    // get service time
     int nservice=job->getServiceCount();
     simtime_t serviceTime=job->getSuggestedTime(nservice)/speedup;
-    //FIXME: select core and start service
-    /*scheduleAt(simTime()+serviceTime, endServiceMsg);
+    int core=getBestCore();
+    setBusyCore(core);
+    jobServiced[core]=job;
+    scheduleAt(simTime()+serviceTime, endServiceMsg[core]);
     if (job->getSlaDeadline()>0){
-        scheduleAt(job->getSlaDeadline(), timeoutMsg);
-    }*/
+        scheduleAt(job->getSlaDeadline(), timeoutMsg[core]);
+    }
+}
+
+int PUChainMCore::getBestCore() {
+    for (int i=(lastUsedCore+1)%ncores; i!=lastUsedCore; i=(i+1)%ncores){
+        if (!busyCore[i]) {
+            lastUsedCore=i;
+            return i;
+        }
+    }
+    return -1;
 }
 
 void PUChainMCore::endService(ChainJob * job) {
@@ -184,7 +194,7 @@ void PUChainMCore::abortService(int jobCoreID) {
 
 void PUChainMCore::setCoreStatus(int coreID, bool busy){
     busyCore[coreID]=busy;
-    //FIXME: emit load signal
+    emit(busySignal, getBusyCores());
 }
 
 void PUChainMCore::setFreeCore(int coreID) {
