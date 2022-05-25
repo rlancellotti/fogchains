@@ -35,9 +35,6 @@ class PUChain : public cSimpleModule
         ChainJob *jobServiced;
         cMessage *endServiceMsg;
         cMessage *timeoutMsg;
-        cQueue queue;
-        int capacity;
-        double speedup;
 
     public:
         PUChain();
@@ -45,6 +42,9 @@ class PUChain : public cSimpleModule
         int length();
 
     protected:
+        cQueue queue;
+        int capacity;
+        double speedup;
         virtual ChainJob *getFromQueue();
         virtual void initialize() override;
         virtual void handleMessage(cMessage *msg) override;

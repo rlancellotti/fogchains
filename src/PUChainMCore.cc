@@ -47,7 +47,7 @@ void PUChainMCore::initialize() {
     queue.setName("queue");
 }
 
-int PUChainMCore::isEndServiceMsg(cMessage *msg){
+int PUChainMCore::getEndServiceMsgId(cMessage *msg){
     for (int i=0; i<ncores; i++) {
         if (msg==endServiceMsg[i])
             return i;
@@ -55,7 +55,7 @@ int PUChainMCore::isEndServiceMsg(cMessage *msg){
     return -1;
 }
 
-int PUChainMCore::isTimeoutMsg(cMessage *msg){
+int PUChainMCore::getTimeoutMsgId(cMessage *msg){
     for (int i=0; i<ncores; i++) {
         if (msg==timeoutMsg[i])
             return i;
@@ -83,9 +83,10 @@ int PUChainMCore::getCoreFromJob(ChainJob *job){
 
 void PUChainMCore::handleMessage(cMessage *msg) {
     // End Service or Timeout
-    int endmsg=isEndServiceMsg(msg);
-    int tomsg=isTimeoutMsg(msg);
-    if (endmsg<0 || tomsg<0) {
+    int endmsg=getEndServiceMsgId(msg);
+    int tomsg=getTimeoutMsgId(msg);
+    EV<<"handleMessage: endmsg="<<endmsg<<" tomsg="<<tomsg<<endl;
+    if (endmsg>=0 || tomsg>=0) {
         if (endmsg>=0){
             endService(endmsg);
         } else if (tomsg >=0){
@@ -100,7 +101,10 @@ void PUChainMCore::handleMessage(cMessage *msg) {
     }
     // New job
     ChainJob *job = check_and_cast<ChainJob *>(msg);
+    EV<<"arrival of a new job"<<endl;
     arrival(job);
+    printCores();
+    //EV<<"getBusyCores()="<<getBusyCores()<<endl;
     if (getBusyCores()<ncores) {
         // there is an idle core
         startService(job);
@@ -131,6 +135,14 @@ void PUChainMCore::refreshDisplay() const {
     job->setTimestamp();
 }*/
 
+void PUChainMCore::printCores(){
+    EV<<"Core status: [";
+    for (int i=0; i<ncores; i++){
+        EV<<(busyCore[i]?"B":".");
+    }
+    EV<<"]"<<endl;
+}
+
 void PUChainMCore::startService(ChainJob *job) {
     // gather queueing time statistics
     simtime_t d = simTime() - job->getTimestamp();
@@ -140,9 +152,12 @@ void PUChainMCore::startService(ChainJob *job) {
     job->setTimestamp();
     int nservice=job->getServiceCount();
     simtime_t serviceTime=job->getSuggestedTime(nservice)/speedup;
+    //printCores();
     int core=getBestCore();
+    //EV<<"selected core "<<core<<endl;
     setBusyCore(core);
     jobServiced[core]=job;
+    //printCores();
     scheduleAt(simTime()+serviceTime, endServiceMsg[core]);
     if (job->getSlaDeadline()>0){
         scheduleAt(job->getSlaDeadline(), timeoutMsg[core]);
@@ -150,12 +165,19 @@ void PUChainMCore::startService(ChainJob *job) {
 }
 
 int PUChainMCore::getBestCore() {
-    for (int i=(lastUsedCore+1)%ncores; i!=lastUsedCore; i=(i+1)%ncores){
-        if (!busyCore[i]) {
-            lastUsedCore=i;
-            return i;
+    EV<<"getBestCore()"<<endl;
+    //printCores();
+    //for (int i=(lastUsedCore+1)%ncores; i!=lastUsedCore; i=(i+1)%ncores){
+    for (int i=1; i<=ncores; i++){
+        //EV<<"i="<<i<<" busy[i]="<<busyCore[i]<<endl;
+        int c=(lastUsedCore+i)%ncores;
+        if (!busyCore[c]) {
+            lastUsedCore=c;
+            //EV<<"selecting core"<<i<<endl;
+            return c;
         }
     }
+    EV<<"no avaialbe core found: something went wrong in getBestCore()"<<endl;
     return -1;
 }
 
@@ -164,7 +186,7 @@ void PUChainMCore::endService(ChainJob * job) {
 }
 
 void PUChainMCore::endService(int jobCoreID) {
-    if (jobCoreID>0)
+    if (jobCoreID<0)
         return;
     ChainJob *job=jobServiced[jobCoreID];
     EV << "Finishing service of " << job->getName() << endl;
@@ -172,6 +194,7 @@ void PUChainMCore::endService(int jobCoreID) {
     job->setServiceTime(job->getServiceTime() + d);
     cancelEvent(timeoutMsg[jobCoreID]);
     setFreeCore(jobCoreID);
+    //printCores();
     send(job, "out");
 }
 
@@ -180,10 +203,10 @@ void PUChainMCore::abortService(ChainJob * job) {
 }
 
 void PUChainMCore::abortService(int jobCoreID) {
-    if (jobCoreID>0)
+    if (jobCoreID<0)
         return;
     ChainJob *job=jobServiced[jobCoreID];
-    EV << "Timout for " << job->getName() << endl;
+    EV << "Timeout for " << job->getName() << endl;
     if (hasGUI())
         bubble("Dropped!");
     emit(droppedSignal, 1);

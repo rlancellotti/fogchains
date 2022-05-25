@@ -39,17 +39,15 @@ class PUChainMCore : public PUChain
         std::vector<ChainJob *> jobServiced;
         std::vector<cMessage *> endServiceMsg;
         std::vector<cMessage *> timeoutMsg;
-        cQueue queue;
-        int capacity;
         int ncores;
         int lastUsedCore;
-        double speedup;
 
         int getBusyCores() const;
-        int isEndServiceMsg(cMessage *msg);
-        int isTimeoutMsg(cMessage *msg);
+        int getEndServiceMsgId(cMessage *msg);
+        int getTimeoutMsgId(cMessage *msg);
 
         int getCoreFromJob(ChainJob *job);
+        void printCores();
 
     public:
         PUChainMCore();

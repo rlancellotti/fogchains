@@ -32,3 +32,4 @@ simulations/*.json
 simulations/*.ini
 .vscode/*
 *.code-workspace
+.qtenvrc

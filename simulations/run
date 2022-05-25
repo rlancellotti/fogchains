@@ -1,5 +1,5 @@
 #!/bin/sh
 cd `dirname $0`
 ../src/fogchains -n .:../src $*
-#../src/fog_dbg -n .:../src $*
+#../src/fogchains_dbg -n .:../src $*
 # for shared lib, use: opp_run -l ../src/fog -n .:../src $*
