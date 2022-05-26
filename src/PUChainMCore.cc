@@ -17,6 +17,7 @@ PUChainMCore::PUChainMCore() {
 }
 
 PUChainMCore::~PUChainMCore() {
+    //FIXME: smarter clean procedure for cores
     jobServiced.clear();
     for (int i=0; i<ncores; i++){
         cancelAndDelete(endServiceMsg[i]);
@@ -40,6 +41,7 @@ void PUChainMCore::initialize() {
     for (int i=0; i<ncores; i++){
         endServiceMsg[i]=new cMessage("end-service");
         timeoutMsg[i]=new cMessage("timeout");
+        jobServiced[i]=nullptr;
         busyCore[i]=false;
     }
     lastUsedCore=0;
@@ -103,7 +105,7 @@ void PUChainMCore::handleMessage(cMessage *msg) {
     ChainJob *job = check_and_cast<ChainJob *>(msg);
     EV<<"arrival of a new job"<<endl;
     arrival(job);
-    printCores();
+    //printCores();
     //EV<<"getBusyCores()="<<getBusyCores()<<endl;
     if (getBusyCores()<ncores) {
         // there is an idle core
@@ -165,7 +167,7 @@ void PUChainMCore::startService(ChainJob *job) {
 }
 
 int PUChainMCore::getBestCore() {
-    EV<<"getBestCore()"<<endl;
+    //EV<<"getBestCore()"<<endl;
     //printCores();
     //for (int i=(lastUsedCore+1)%ncores; i!=lastUsedCore; i=(i+1)%ncores){
     for (int i=1; i<=ncores; i++){
@@ -177,7 +179,7 @@ int PUChainMCore::getBestCore() {
             return c;
         }
     }
-    EV<<"no avaialbe core found: something went wrong in getBestCore()"<<endl;
+    EV<<"no available core found: something went wrong in getBestCore()"<<endl;
     return -1;
 }
 
@@ -189,6 +191,7 @@ void PUChainMCore::endService(int jobCoreID) {
     if (jobCoreID<0)
         return;
     ChainJob *job=jobServiced[jobCoreID];
+    jobServiced[jobCoreID]=nullptr;
     EV << "Finishing service of " << job->getName() << endl;
     simtime_t d = simTime() - job->getTimestamp();
     job->setServiceTime(job->getServiceTime() + d);
@@ -206,6 +209,7 @@ void PUChainMCore::abortService(int jobCoreID) {
     if (jobCoreID<0)
         return;
     ChainJob *job=jobServiced[jobCoreID];
+    jobServiced[jobCoreID]=nullptr;
     EV << "Timeout for " << job->getName() << endl;
     if (hasGUI())
         bubble("Dropped!");

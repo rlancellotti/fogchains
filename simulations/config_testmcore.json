@@ -1,0 +1,34 @@
+{
+    "scenario_schema": {
+        "rho": {"pattern": "**.rho", "type": "real"},
+        "ncores": {"pattern": "**.nCores", "type": "int"}
+    },
+    "metrics": {
+        "SrcSent": {"module": "**.source", "scalar_name": "sentJob:count" ,"aggr": ["none"]},
+        "SinkTResp": {"module": "**.sink", "scalar_name": "responseTime:stats/mean", "aggr": ["none"]},
+        "SinkTQueue": {"module": "**.sink", "scalar_name": "totalQueueingTime:stats/mean", "aggr": ["none"]},
+        "SinkTServ": {"module": "**.sink", "scalar_name": "totalServiceTime:stats/mean", "aggr": ["none"]},
+        "SinkStdTResp": {"module": "**.sink", "scalar_name": "responseTime:stats/stddev", "aggr": ["none"]},
+        "FogRho": {"module": "**.pu", "scalar_name": "busy:timeavg", "aggr": ["avg", "std"]},
+        "Drop": {"module": "**.pu", "scalar_name": "dropped:count", "aggr": ["avg", "std"]},
+        "SinkRecvd": {"module": "**.sink", "scalar_name": "responseTime:stats/count", "aggr": ["none"]}
+    },
+    "analyses": {
+        "All": {
+            "outfile": "analysis/testmcore.data",
+            "scenarios": {
+                "fixed": {},
+                "range": ["ncores", "rho"]
+            },
+            "metrics": [
+                {"metric": "SrcSent", "aggr": "none"},
+                {"metric": "SinkTResp", "aggr": "none"},
+                {"metric": "SinkTQueue", "aggr": "none"},
+                {"metric": "SinkTServ", "aggr": "none"},
+                {"metric": "FogRho", "aggr": "avg"},
+                {"metric": "SinkRecvd", "aggr": "none"},
+                {"metric": "Drop", "aggr": "avg"}
+            ]
+       }
+    }
+}

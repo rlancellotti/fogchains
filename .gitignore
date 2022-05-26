@@ -33,3 +33,4 @@ simulations/*.ini
 .vscode/*
 *.code-workspace
 .qtenvrc
+*.gnuplot
