@@ -16,6 +16,7 @@ fogchains_dbg
 out/*
 src/out/*
 *.sca
+*.sca.gz
 *.vec
 *.vci
 .settings/
@@ -30,6 +31,7 @@ simulations/.*
 simulations/analysis
 simulations/*.json
 simulations/*.ini
+simulations/results
 .vscode/*
 *.code-workspace
 .qtenvrc
