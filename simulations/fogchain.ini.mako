@@ -1,6 +1,11 @@
 <%
 import json
+import math
 files = ['output_nfog3_run0.json']
+
+# CoV of network delay
+delaycv=0.05 
+
 def get_nspc(chain):
     try:
         nspc=-1
@@ -9,6 +14,14 @@ def get_nspc(chain):
         return nspc
     except KeyError:
         return 1
+
+def lognorm_mean(mean, cv):
+    #print(mean, cv)
+    return math.log(mean * 1.0/math.sqrt(1.0+cv**2))
+
+def lognorm_sd(cv):
+    return math.sqrt(math.log(1.0+cv**2))
+
 %>\
 [General]
 network = FogChain
@@ -55,10 +68,12 @@ nspc=get_nspc(sol['servicechain'])
 **.source[${ns}].sendInterval = exponential(1s * ${1.0/s['lambda']})
 **.source[${ns}].chainLenght = ${len(sol['servicechain'][c]['services'])}
 %for k, m in enumerate(sol['servicechain'][c]['services']):
+<%
+meansrv=sol['servicechain'][c]['services'][m]['meanserv']
+cvsrv=sol['servicechain'][c]['services'][m]['stddevserv']/meansrv
+%>\
 **.source[${ns}].output_${k} = ${foglookup[sol['microservice'][m]]}
-**.source[${ns}].suggestedTime_${k+1} = 1s * truncnormal(\
-${sol['servicechain'][c]['services'][m]['meanserv']}, \
-${sol['servicechain'][c]['services'][m]['stddevserv']}) # ${m}
+**.source[${ns}].suggestedTime_${k+1} = 1s * lognormal(${lognorm_mean(meansrv, cvsrv)}, ${lognorm_sd(cvsrv)}) # ${m}
 **.source[${ns}].exitProbability_${k+1} = 0.0
 %endfor
 **.source[${ns}].output_${len(sol['servicechain'][c]['services'])} = -1
@@ -68,7 +83,11 @@ ${sol['servicechain'][c]['services'][m]['stddevserv']}) # ${m}
 %if 'network' in sol.keys():
 %for s, row in enumerate(sol['network']):
 %for d, delay in enumerate(row):
-**.delay[${s*nnodes+d}].delay = 1s * truncnormal(${delay}, ${0.05 * delay}) # delay ${s} -> ${d}
+%if delay <=0:
+**.delay[${s*nnodes+d}].delay = 0s # delay ${s} -> ${d}
+%else:
+**.delay[${s*nnodes+d}].delay = 1s * lognormal(${lognorm_mean(delay, delaycv)}, ${lognorm_sd(delaycv)}) # delay ${s} -> ${d}
+%endif
 %endfor
 %endfor
 %endif

@@ -37,7 +37,7 @@ simple SinkChain
         @statistic[totalServiceTime](title="the total time spent being processed by arrived jobs";unit=s;record=vector?,stats;interpolationmode=none);
         @statistic[queuesVisited](title="the total number of queues visited by arrived jobs";record=vector?,stats;interpolationmode=none);
         @statistic[delaysVisited](title="the total number of delays visited by arrived jobs";record=vector?,stats;interpolationmode=none);
-        @statistic[earlyExit](title="the total number of delays visited by arrived jobs";record=vector?,stats,histogram;interpolationmode=none);
+        @statistic[earlyExit](title="the total number of early exits in arrived jobs";record=vector?,stats,histogram;interpolationmode=none);
     gates:
         input in[];
 }
