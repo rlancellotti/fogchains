@@ -30,6 +30,8 @@ void PUChain::initialize() {
     queueingTimeSignal = registerSignal("queueingTime");
     serviceTimeSignal = registerSignal("serviceTime");
     queueLengthSignal = registerSignal("queueLength");
+    interarrivalTimesignal = registerSignal("interarrivalTime");
+    setLastArrival(0.0);
     emit(queueLengthSignal, 0);
     busySignal = registerSignal("busy");
     emit(busySignal, false);
@@ -38,6 +40,14 @@ void PUChain::initialize() {
     timeoutMsg = new cMessage("timeout");
     capacity = par("capacity");
     queue.setName("queue");
+}
+
+void PUChain::setLastArrival(simtime_t t){
+    lastArrival=t;
+}
+
+simtime_t PUChain::getLastArrival(){
+    return lastArrival;
 }
 
 void PUChain::handleMessage(cMessage *msg) {
@@ -98,6 +108,8 @@ int PUChain::length() {
 }
 
 void PUChain::arrival(ChainJob *job) {
+    emit(interarrivalTimesignal, simTime() - getLastArrival());
+    setLastArrival(simTime());
     job->setTimestamp();
 }
 

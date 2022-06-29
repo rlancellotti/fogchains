@@ -30,6 +30,8 @@ void PUChainMCore::initialize() {
     queueingTimeSignal = registerSignal("queueingTime");
     serviceTimeSignal = registerSignal("serviceTime");
     queueLengthSignal = registerSignal("queueLength");
+    interarrivalTimesignal = registerSignal("interarrivalTime");
+    setLastArrival(0.0);
     emit(queueLengthSignal, 0);
     busySignal = registerSignal("busy");
     emit(busySignal, 0);
@@ -132,11 +134,6 @@ void PUChainMCore::refreshDisplay() const {
     getDisplayString().setTagArg("i2", 0, getBusyCores()>0 ? "status/execute" : "");
     getDisplayString().setTagArg("i", 1, queue.isEmpty() ? "" : "cyan");
 }
-
-/*same as superclass, no need to redefine it*/
-/*void PUChainMCore::arrival(ChainJob *job) {
-    job->setTimestamp();
-}*/
 
 void PUChainMCore::printCores(){
     EV<<"Core status: [";

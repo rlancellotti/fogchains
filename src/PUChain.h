@@ -40,12 +40,14 @@ class PUChain : public cSimpleModule
     	simsignal_t droppedSignal;
 		simsignal_t queueLengthSignal;
 		simsignal_t queueingTimeSignal;
+        simsignal_t interarrivalTimesignal;
 		simsignal_t serviceTimeSignal;
 		simsignal_t busySignal;
 
         cQueue queue;
         int capacity;
         double speedup;
+        simtime_t lastArrival;
         virtual ChainJob *getFromQueue();
         virtual void initialize() override;
         virtual void handleMessage(cMessage *msg) override;
@@ -56,6 +58,9 @@ class PUChain : public cSimpleModule
         virtual void startService(ChainJob *job);
         virtual void endService(ChainJob *job);
         virtual void abortService(ChainJob *job);
+        void setLastArrival(simtime_t t);
+        simtime_t getLastArrival();
+
 };
 
 }; //namespace
