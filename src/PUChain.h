@@ -27,11 +27,6 @@ namespace fog {
 class PUChain : public cSimpleModule
 {
     private:
-		simsignal_t droppedSignal;
-		simsignal_t queueLengthSignal;
-		simsignal_t queueingTimeSignal;
-		simsignal_t busySignal;
-
         ChainJob *jobServiced;
         cMessage *endServiceMsg;
         cMessage *timeoutMsg;
@@ -42,6 +37,12 @@ class PUChain : public cSimpleModule
         int length();
 
     protected:
+    	simsignal_t droppedSignal;
+		simsignal_t queueLengthSignal;
+		simsignal_t queueingTimeSignal;
+		simsignal_t serviceTimeSignal;
+		simsignal_t busySignal;
+
         cQueue queue;
         int capacity;
         double speedup;

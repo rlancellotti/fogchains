@@ -28,6 +28,7 @@ PUChain::~PUChain() {
 void PUChain::initialize() {
     droppedSignal = registerSignal("dropped");
     queueingTimeSignal = registerSignal("queueingTime");
+    serviceTimeSignal = registerSignal("serviceTime");
     queueLengthSignal = registerSignal("queueLength");
     emit(queueLengthSignal, 0);
     busySignal = registerSignal("busy");
@@ -119,6 +120,7 @@ void PUChain::startService(ChainJob *job) {
 void PUChain::endService(ChainJob *job) {
     EV << "Finishing service of " << job->getName() << endl;
     simtime_t d = simTime() - job->getTimestamp();
+    emit(serviceTimeSignal, d);
     job->setServiceTime(job->getServiceTime() + d);
     cancelEvent(timeoutMsg);
     send(job, "out");

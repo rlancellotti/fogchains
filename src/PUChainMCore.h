@@ -29,10 +29,6 @@ namespace fog {
 class PUChainMCore : public PUChain
 {
     private:
-		simsignal_t droppedSignal;
-		simsignal_t queueLengthSignal;
-		simsignal_t queueingTimeSignal;
-		simsignal_t busySignal; // this signal provides the numebr of busy cores
 
         std::vector<bool> busyCore; // status of the cores
 
@@ -54,6 +50,7 @@ class PUChainMCore : public PUChain
         virtual ~PUChainMCore();
 
     protected:
+		//simsignal_t busySignal; -> this signal provides the number of busy cores
         virtual void initialize() override;
         virtual void handleMessage(cMessage *msg) override;
         virtual void refreshDisplay() const override;
