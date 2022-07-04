@@ -1,7 +1,8 @@
 <%
 import json
 import math
-files = ['output_nfog3_run0.json']
+files = conf.files
+#files = ['sample_output_0011.json', 'sample_output_0101.json', 'sample_output_0110.json']
 
 # CoV of network delay
 delaycv=0.05 
@@ -25,10 +26,10 @@ def lognorm_sd(cv):
 %>\
 [General]
 network = FogChain
-sim-time-limit = 10800s
+sim-time-limit = 108000s
 cmdenv-config-name = FogChain
 qtenv-default-config = FogChain
-repeat = 1
+repeat = 5
 
 %for fname in files:
 [Config ${fname.removesuffix('.json')}]
@@ -46,6 +47,7 @@ nspc=get_nspc(sol['servicechain'])
 **.nNodes=${nnodes}
 **.networkDelay=${'true' if 'network' in sol.keys() else 'false'}
 **.nSrcPerChain=${nspc}
+**.solutionFile="${fname.removesuffix('.json')}"
 
 # Fog nodes
 %for i, f in enumerate(sol['fog']):
@@ -73,7 +75,7 @@ meansrv=sol['servicechain'][c]['services'][m]['meanserv']
 cvsrv=sol['servicechain'][c]['services'][m]['stddevserv']/meansrv
 %>\
 **.source[${ns}].output_${k} = ${foglookup[sol['microservice'][m]]}
-**.source[${ns}].suggestedTime_${k+1} = 1s * lognormal(${lognorm_mean(meansrv, cvsrv)}, ${lognorm_sd(cvsrv)}) # ${m}
+**.source[${ns}].suggestedTime_${k+1} = 1s * lognormal(${lognorm_mean(meansrv, cvsrv)}, ${lognorm_sd(cvsrv)}) # ${m} (mean: ${meansrv}, stddev: ${meansrv * cvsrv})
 **.source[${ns}].exitProbability_${k+1} = 0.0
 %endfor
 **.source[${ns}].output_${len(sol['servicechain'][c]['services'])} = -1
@@ -86,7 +88,7 @@ cvsrv=sol['servicechain'][c]['services'][m]['stddevserv']/meansrv
 %if delay <=0:
 **.delay[${s*nnodes+d}].delay = 0s # delay ${s} -> ${d}
 %else:
-**.delay[${s*nnodes+d}].delay = 1s * lognormal(${lognorm_mean(delay, delaycv)}, ${lognorm_sd(delaycv)}) # delay ${s} -> ${d}
+**.delay[${s*nnodes+d}].delay = 1s * lognormal(${lognorm_mean(delay, delaycv)}, ${lognorm_sd(delaycv)}) # delay ${s} -> ${d} (mean: ${delay}, stddev: ${delay * delaycv})
 %endif
 %endfor
 %endfor
