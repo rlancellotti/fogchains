@@ -36,3 +36,4 @@ simulations/results
 *.code-workspace
 .qtenvrc
 *.gnuplot
+simulations/run_all.sh
