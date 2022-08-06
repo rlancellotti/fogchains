@@ -51,7 +51,7 @@ nspc=get_nspc(sol['servicechain'])
 
 # Fog nodes
 %for i, f in enumerate(sol['fog']):
-**.pu[${i}].speedup = ${sol['fog'][f]['capacity']}
+**.pu[${i}].speedup = ${sol['fog'][f]['capacity']} # fog node ${f}
 <% foglookup[f]=i %>\
 %endfor
 
@@ -74,7 +74,8 @@ nspc=get_nspc(sol['servicechain'])
 meansrv=sol['servicechain'][c]['services'][m]['meanserv']
 cvsrv=sol['servicechain'][c]['services'][m]['stddevserv']/meansrv
 %>\
-**.source[${ns}].output_${k} = ${foglookup[sol['microservice'][m]]}
+# Micro service ${m}
+**.source[${ns}].output_${k} = ${foglookup[sol['microservice'][m]]} # ${m} mapped on ${sol['microservice'][m]}
 **.source[${ns}].suggestedTime_${k+1} = 1s * lognormal(${lognorm_mean(meansrv, cvsrv)}, ${lognorm_sd(cvsrv)}) # ${m} (mean: ${meansrv}, stddev: ${meansrv * cvsrv})
 **.source[${ns}].exitProbability_${k+1} = 0.0
 %endfor
@@ -86,9 +87,9 @@ cvsrv=sol['servicechain'][c]['services'][m]['stddevserv']/meansrv
 %for s, row in enumerate(sol['network']):
 %for d, delay in enumerate(row):
 %if delay <=0:
-**.delay[${s*nnodes+d}].delay = 0s # delay ${s} -> ${d}
+**.delay[${s*nnodes+d}].delay = 0s # delay ${list(sol['fog'].keys())[s]} -> ${list(sol['fog'].keys())[d]}
 %else:
-**.delay[${s*nnodes+d}].delay = 1s * lognormal(${lognorm_mean(delay, delaycv)}, ${lognorm_sd(delaycv)}) # delay ${s} -> ${d} (mean: ${delay}, stddev: ${delay * delaycv})
+**.delay[${s*nnodes+d}].delay = 1s * lognormal(${lognorm_mean(delay, delaycv)}, ${lognorm_sd(delaycv)}) # delay ${list(sol['fog'].keys())[s]} -> ${list(sol['fog'].keys())[d]} (mean: ${delay}, stddev: ${delay * delaycv})
 %endif
 %endfor
 %endfor
