@@ -1,6 +1,7 @@
 <%
 import json
-files = ['fog_polimi.json']
+#files = ['fog_polimi.json']
+files = ['fog_polimi_replica.json']
 def get_nspc(chain):
     try:
         nspc=-1
