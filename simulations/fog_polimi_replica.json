@@ -1,0 +1,98 @@
+{
+  "servicechain": {
+    "SC1_R1": {
+      "services": {
+        "MS1_1R1": {
+          "meanserv": 2.427502903611013,
+          "exitprobability": 0
+        },
+        "MS1_2R1": {
+          "meanserv": 6.586155486010255,
+          "exitprobability": 0
+        },
+        "MS1_3R1": {
+          "meanserv": 0.9863416103787319,
+          "exitprobability": 0
+        }
+      },
+      "sources": [
+        {
+          "startTime": 0,
+          "stopTime": -1,
+          "lambda": 0.45
+        }
+      ]
+    },
+    "SC1_R2": {
+      "services": {
+        "MS1_1R2": {
+          "meanserv": 2.427502903611013,
+          "exitprobability": 0
+        },
+        "MS1_2R2": {
+          "meanserv": 6.586155486010255,
+          "exitprobability": 0
+        },
+        "MS1_3R2": {
+          "meanserv": 0.9863416103787319,
+          "exitprobability": 0
+        }
+      },
+      "sources": [
+        {
+          "startTime": 0,
+          "stopTime": -1,
+          "lambda": 0.45
+        }
+      ]
+    }
+  },
+  "microservice": {
+    "MS1_1R1": "F2_1",
+    "MS1_2R1": "F1",
+    "MS1_3R1": "F3",
+    "MS1_1R2": "F2_2",
+    "MS1_2R2": "F1",
+    "MS1_3R2": "F3"
+  },
+  "fog": {
+    "F1": {
+      "capacity": 1.0
+    },
+    "F2_1": {
+      "capacity": 1.0
+    },
+    "F2_2": {
+      "capacity": 1.0
+    },
+    "F3": {
+      "capacity": 1.0
+    }
+  },
+  "network": [
+    [
+      0.0,
+      3.534661838885495,
+      3.534661838885495,
+      3.534661838885495
+    ],
+    [
+      3.534661838885495,
+      0.0,
+      0.0,
+      2.6064481437937124
+    ],
+    [
+      3.534661838885495,
+      0.0,
+      0.0,
+      2.6064481437937124
+    ],
+    [
+      3.534661838885495,
+      2.6064481437937124,
+      2.6064481437937124,
+      0.0
+    ]
+  ]
+}
