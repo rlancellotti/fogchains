@@ -34,7 +34,7 @@ void PUChain::initialize() {
     setLastArrival(0.0);
     emit(queueLengthSignal, 0);
     busySignal = registerSignal("busy");
-    emit(busySignal, false);
+    emit(busySignal, 0);
     speedup=par("speedup");
     endServiceMsg = new cMessage("end-service");
     timeoutMsg = new cMessage("timeout");
@@ -60,7 +60,7 @@ void PUChain::handleMessage(cMessage *msg) {
         }
         if (queue.isEmpty()) {
             jobServiced = nullptr;
-            emit(busySignal, false);
+            emit(busySignal, 0);
         }
         else {
             jobServiced = getFromQueue();
@@ -75,7 +75,7 @@ void PUChain::handleMessage(cMessage *msg) {
     if (!jobServiced) {
         // processor was idle
         jobServiced = job;
-        emit(busySignal, true);
+        emit(busySignal, 1);
         startService(jobServiced);
     }
     else {
