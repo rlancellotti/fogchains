@@ -19,6 +19,7 @@ src/out/*
 *.sca.gz
 *.vec
 *.vci
+*.anf
 .settings/
 .cproject
 .nedexclusions
