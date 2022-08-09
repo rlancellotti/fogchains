@@ -1,5 +1,13 @@
 #!/bin/sh
 cd `dirname $0`
-../src/fogchains -n .:../src $*
+if [ -n "${DEBUG}" ]
+then
+    echo "debug mode on"
+    EXENAME=../src/fogchains_dbg
+else
+    echo "debug mode off"
+    EXENAME=../src/fogchains
+fi
+${EXENAME} -n .:../src $*
 #../src/fogchains_dbg -n .:../src $*
-# for shared lib, use: opp_run -l ../src/fog -n .:../src $*
+# for shared lib, use: opp_run -l ../src/fogchains -n .:../src $*
