@@ -65,8 +65,8 @@ network FogChain
         sinkmisc: SinkChain;
     connections:
         // link source to first level of dispatchers
-        for i=0..nChains-1 {
-            source[i].out --> initDispatcher[i].in;
+        for i=0..nChains-1, for r=0..nSrcPerChain-1 {
+            source[(i*nSrcPerChain)+r].out --> initDispatcher[i].in++;
         }
         // interconnection of first level of dispaters to nodes
         for d=0..nChains-1, for p=0..nNodes-1 {
@@ -74,7 +74,7 @@ network FogChain
         } 
         for i=0..nNodes-1 {
             // output of PU with following dispatcher
-            pu[i].out --> dispatcher[i].in;
+            pu[i].out --> dispatcher[i].in++;
         }
         // interconnection among dispatchers
         for d=0..nNodes-1, for p=0..nNodes-1 {

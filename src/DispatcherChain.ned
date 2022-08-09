@@ -9,7 +9,7 @@ simple DispatcherChain
     parameters:
         @display("i=block/dispatch");    
     gates:
-        input in;
+        input in[];
         output out[];
         output sinkout;
 }
