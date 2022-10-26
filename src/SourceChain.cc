@@ -52,6 +52,7 @@ void SourceChain::handleMessage(cMessage *msg)
     ASSERT(msg==timerMessage);
     // stop condition
     if (stopTime >= 0 && stopTime < simTime()) {
+        EV<<this->getFullName()<<" discarding event because sourc already stopped"<<endl;
         return;
     }
     // create new message
@@ -99,8 +100,8 @@ void SourceChain::scheduleJob(simtime_t offset){
     simtime_t t, trand;
     trand=par("sendInterval");
     t=(maxInterval>0 && trand>maxInterval)?t=offset + maxInterval:t=offset + trand;
+    //EV<<"schedule job @t="<<t<<endl;
     scheduleAt(t, timerMessage);
-
 }
 
 const char *SourceChain::getJobName(){
