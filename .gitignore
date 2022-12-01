@@ -33,8 +33,14 @@ simulations/analysis
 simulations/*.json
 simulations/*.ini
 simulations/results
-.vscode/*
+**/.vscode/*
 *.code-workspace
 .qtenvrc
 *.gnuplot
 simulations/run_all.sh
+*.keep
+*.bak
+simulations/complex.yaml
+simulations/fogchain_polimi.ini.mako
+simulations/config_fogchain.json.mako
+simulations/fog_polimi.json
