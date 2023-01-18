@@ -36,7 +36,6 @@ void DelayChain::handleMessage(cMessage *msg)
         job->setDelayCount(job->getDelayCount()+1);
         simtime_t d = simTime() - job->getSendingTime();
         job->setDelayTime(job->getDelayTime() + d);
-
         // if it was a self message (ie. we have already delayed) so we send it out
         currentlyStored--;
         send(job, "out");

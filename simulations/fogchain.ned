@@ -15,7 +15,7 @@
 
 package fog.simulations;
 
-import fog.SourceChain;
+import fog.SourceChain2;
 import fog.SinkChain;
 import fog.DelayChain;
 import fog.PUChain;
@@ -35,7 +35,7 @@ network FogChain
         bool networkDelay = default(false);
         //string pustring=choose(int(networkDelay), "p=,,c p=,,ri");
     submodules:
-        source[nChains*nSrcPerChain]: SourceChain;
+        source[nChains*nSrcPerChain]: SourceChain2;
         delay[nNodes * nNodes]: DelayChain if networkDelay {
             parameters:
                 @display("p=,,c;is=vs");
