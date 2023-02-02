@@ -21,8 +21,8 @@ RUN git clone https://github.com/rlancellotti/omnet_analyzer.git
 WORKDIR /root/omnet_analyzer
 RUN pip3 install -r requirements.txt
 RUN python3 install_tools.py
-COPY container/run ${HOME}/bin/
+COPY simulations/run ${HOME}/bin/
 # shell setup
 WORKDIR /root
-COPY container/bash_aliases ${HOME}/.bash_aliaes
+COPY container/bash_aliases ${HOME}/.bash_aliases
 CMD /bin/bash --init-file ${HOME}/.bashrc
