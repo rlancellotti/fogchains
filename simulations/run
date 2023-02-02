@@ -1,12 +1,13 @@
 #!/bin/sh
 cd `dirname $0`
+EXEPATH=${__omnetpp_root_dir}/samples/fogchains/src
 if [ -n "${DEBUG}" ]
 then
     echo "debug mode on"
-    EXENAME=../src/fogchains_dbg
+    EXENAME=${EXEPATH}/fogchains_dbg
 else
     echo "debug mode off"
-    EXENAME=../src/fogchains
+    EXENAME=${EXEPATH}/fogchains
 fi
 ${EXENAME} -n .:../src $*
 #../src/fogchains_dbg -n .:../src $*
