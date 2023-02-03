@@ -16,7 +16,7 @@ RUN pwd && ls -l .
 RUN make makefiles && make
 # install tools
 WORKDIR /root
-RUN apt update && apt install -y libsqlite3-dev
+RUN apt update && apt install -y libsqlite3-dev vim less
 RUN git clone https://github.com/rlancellotti/omnet_analyzer.git
 WORKDIR /root/omnet_analyzer
 RUN pip3 install -r requirements.txt
