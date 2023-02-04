@@ -55,7 +55,7 @@ def chain_description(c):
 
 %>\
 [General]
-network = FogChain
+network = fog.simulations.FogChain
 sim-time-limit = 108000s
 cmdenv-config-name = FogChain
 qtenv-default-config = FogChain
