@@ -45,3 +45,4 @@ simulations/fogchain_polimi.ini.mako
 simulations/config_fogchain.json.mako
 simulations/fog_polimi.json
 simulations/*.yaml
+container/setup_container.sh

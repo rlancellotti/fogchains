@@ -8,9 +8,8 @@ then
     echo "debug mode on"
     EXENAME=${EXEPATH}/fogchains_dbg
 else
-    echo "debug mode off"
+    # echo "debug mode off"
     EXENAME=${EXEPATH}/fogchains
 fi
 ${EXENAME} -n ${SIMPATH}:${SRCPATH} $*
-#../src/fogchains_dbg -n .:../src $*
-# for shared lib, use: opp_run -l ../src/fogchains -n .:../src $*
+# for shared lib, use: opp_run -l ../src/fogchains -n ${SIMPATH}:${SRCPATH} $*

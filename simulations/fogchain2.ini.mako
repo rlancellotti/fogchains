@@ -45,9 +45,12 @@ def chain_description(c):
     chain='['
     for i, m in enumerate(sol['servicechain'][c]['services']):
         meansrv=sol['servicechain'][c]['services'][m]['meanserv']
-        cvsrv=sol['servicechain'][c]['services'][m]['stddevserv']/meansrv
+        cvsrv=sol['servicechain'][c]['services'][m]['stddevserv']/meansrv if 'stddevserv' in sol['servicechain'][c]['services'][m].keys() else None
         exprob=sol['servicechain'][c]['services'][m]['exitprobability'] if 'exitprobability' in sol['servicechain'][c]['services'][m].keys() else 0.0
-        chain +='{suggestedTime: lognormal(%f, %f), node: %s, exitProbability: %f}'%(lognorm_mean(meansrv, cvsrv), lognorm_sd(cvsrv), node_description(sol['microservice'][m]), exprob)
+        if cvsrv is None:
+            chain +='{suggestedTime: exponential(%f), node: %s, exitProbability: %f}'%(meansrv, node_description(sol['microservice'][m]), exprob)
+        else:
+            chain +='{suggestedTime: lognormal(%f, %f), node: %s, exitProbability: %f}'%(lognorm_mean(meansrv, cvsrv), lognorm_sd(cvsrv), node_description(sol['microservice'][m]), exprob)
         chain += ', \n\t' if (i<len(sol['servicechain'][c]['services'])-1) else ']'
         #print(chain)
     return chain
