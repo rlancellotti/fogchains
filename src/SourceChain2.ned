@@ -30,14 +30,16 @@ simple SourceChain2
         double startTime @unit(s) = default(0s);
         // stopTime<0 -> stop at simulation end
         double stopTime @unit(s) = default(-1s);
-        volatile object chain=default([{suggestedTime: exponential(1s), // service time. Refer to std capacity PU
+        volatile object chain=default([{srvName: "firstService",
+                               suggestedTime: exponential(1s), // service time. Refer to std capacity PU
                                node: [{id: -1, weight: 1}], // int x means PU x
                                exitProbability: 0.0, // exit probability after each service. Should be float in range [0,1]
                             }]);
         double suggestedDeadline @unit(s) = default(-1s);
         double maxInterval @unit(s) = default(-1s);
         int appId = default(1);
-        string jobName =default("job"); 
+        string jobName = default("job");
+        string mappingOracle = default("MappingOracle");
         int packetLength=default(1); 
     gates:
         output out;

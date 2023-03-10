@@ -48,9 +48,9 @@ def chain_description(c):
         cvsrv=sol['servicechain'][c]['services'][m]['stddevserv']/meansrv if 'stddevserv' in sol['servicechain'][c]['services'][m].keys() else None
         exprob=sol['servicechain'][c]['services'][m]['exitprobability'] if 'exitprobability' in sol['servicechain'][c]['services'][m].keys() else 0.0
         if cvsrv is None:
-            chain +='{suggestedTime: exponential(%f), node: %s, exitProbability: %f}'%(meansrv, node_description(sol['microservice'][m]), exprob)
+            chain +='{srvName: "%s", suggestedTime: exponential(%f), node: %s, exitProbability: %f}'%(m, meansrv, node_description(sol['microservice'][m]), exprob)
         else:
-            chain +='{suggestedTime: lognormal(%f, %f), node: %s, exitProbability: %f}'%(lognorm_mean(meansrv, cvsrv), lognorm_sd(cvsrv), node_description(sol['microservice'][m]), exprob)
+            chain +='{srvName: "%s", suggestedTime: lognormal(%f, %f), node: %s, exitProbability: %f}'%(m, lognorm_mean(meansrv, cvsrv), lognorm_sd(cvsrv), node_description(sol['microservice'][m]), exprob)
         chain += ', \n\t' if (i<len(sol['servicechain'][c]['services'])-1) else ']'
         #print(chain)
     return chain

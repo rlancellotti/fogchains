@@ -22,7 +22,7 @@ Define_Module(SourceChain2);
 
 SourceChain2::SourceChain2()
 {
-    timerMessage = NULL;
+    timerMessage = nullptr;
 }
 
 SourceChain2::~SourceChain2()
@@ -40,9 +40,29 @@ void SourceChain2::initialize()
     if (startTime>=0) {
         scheduleJob(startTime);
     }
+    cModule *mod=findModuleByPath(par("mappingOracle"));
+    if (mod!=nullptr){
+        mappingOracle=check_and_cast<MappingOracle *>(mod);
+    }
+    cValueArray* chain=check_and_cast<cValueArray *>(par("chain").objectValue());
+    int chainLenght=getChainLength(chain);
+    for (int i=0; i<chainLenght; i++){
+        cValueMap *service=check_and_cast<cValueMap *>(chain->get(i).objectValue());
+        cValue nodes=service->get("node");
+        if (mappingOracle==nullptr){
+            ServiceMapping *srv=new ServiceMapping(&nodes);
+            srv->setComponent(this);
+            mapping.push_back(srv);
+        } else {
+            //register the services to the mapping oracle
+            const char *srvName=service->get("srvName").stringValue();
+            srvNames.push_back(srvName);
+            mappingOracle->registerService(srvName, &nodes);
+        }
+    }
 }
 
-int SourceChain2::getChainLength(cValueArray *chain){
+long int SourceChain2::getChainLength(cValueArray *chain){
     return chain->size();
 }
 
@@ -51,31 +71,14 @@ double SourceChain2::getFloatChainParam(cValueArray *chain, int idx, const char 
     return map->get(param).doubleValue();
 }
 
-int SourceChain2::getNode(cValueArray *chain, int idx){
-    cValueMap *map=check_and_cast<cValueMap *>(chain->get(idx).objectValue());
-    if (! map->get("node").containsObject()){
-        return map->get("node").intValue();
+long int SourceChain2::getNode(int idx){
+    // if we have mapping oracle, ask the oracle
+    // otherwise, find the right mapping ans ask the service mapping
+    if (mappingOracle==nullptr){
+        return mapping[idx]->getRandomNode();
     } else {
-        cValueArray *nodes=check_and_cast<cValueArray *>(map->get("node").objectValue());
-        int nnodes=nodes->size();
-        // initialize data structures
-        double maxweight=0.0;
-        double weights[nnodes];
-        int ids[nnodes];
-        for (int i=0; i<nnodes; i++){
-            cValueMap *node=check_and_cast<cValueMap *>(nodes->get(i).objectValue());
-            ids[i]=node->get("id").intValue();
-            weights[i]=maxweight+node->get("weight").doubleValue();
-            maxweight=weights[i];
-        }
-        // random number
-        double rnd=dblrand()*maxweight;
-        // return value
-        for (int i=0; i<nnodes; i++){
-            if (weights[i]>=rnd)
-                return ids[i];
-        }
-        return ids[nnodes-1];
+        // FIXME: must return name of the service
+        return mappingOracle->getNodeForService(srvNames[idx]);
     }
 }
 
@@ -110,7 +113,7 @@ ChainJob *SourceChain2::createJob(){
         job->setSuggestedTime(i+1, getFloatChainParam(chain, i, "suggestedTime"));
         job->setExitProbability(i+1, getFloatChainParam(chain, i, "exitProbability"));
         //EV << "exit probability["<< i+1 <<"]: " << job->getExitProbability(i+1)<<endl;
-        job->setOutputs(i, getNode(chain, i));
+        job->setOutputs(i, getNode(i));
     }
     if (par("suggestedDeadline").doubleValue()>0.0){
         job->setSlaDeadline(simTime()+par("suggestedDeadline"));
