@@ -3,15 +3,17 @@ FROM omnetpp/omnetpp:u22.04-6.0
 ENV OMNETPP_RELEASE=omnetpp-6.0
 ENV HOME=/root
 ENV __omnetpp_root_dir=${HOME}/omnetpp/
+ENV __fogchains_root_dir=${HOME}/fogchains/
 ENV PYTHONPATH=${__omnetpp_root_dir}/python
 ENV PATH=${__omnetpp_root_dir}/bin:${HOME}/bin:${PATH}
+ENV BRANCH=mobility
 # prepare directories
-RUN mkdir -p ${__omnetpp_root_dir}/samples
+RUN mkdir -p ${__fogchains_root_dir}
 # download sources
-WORKDIR ${__omnetpp_root_dir}/samples
-RUN git clone https://github.com/rlancellotti/fogchains.git
+WORKDIR ${$HOME}
+RUN git clone -b ${BRANCH} https://github.com/rlancellotti/fogchains.git
 # compile
-WORKDIR ${__omnetpp_root_dir}/samples/fogchains
+WORKDIR ${__fogchains_root_dir}
 RUN pwd && ls -l .
 RUN make makefiles && make
 # install tools
