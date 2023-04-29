@@ -10,12 +10,12 @@ ENV BRANCH=mobility
 # prepare directories
 RUN mkdir -p ${__fogchains_root_dir}
 # download sources
-WORKDIR ${$HOME}
+WORKDIR ${HOME}
 RUN git clone -b ${BRANCH} https://github.com/rlancellotti/fogchains.git
 # compile
 WORKDIR ${__fogchains_root_dir}
 RUN pwd && ls -l .
-RUN make makefiles && make
+RUN make makefiles && make -j $(nproc)
 # install tools
 WORKDIR /root
 RUN apt update && apt install -y libsqlite3-dev vim less
@@ -23,8 +23,9 @@ RUN git clone https://github.com/rlancellotti/omnet_analyzer.git
 WORKDIR /root/omnet_analyzer
 RUN pip3 install -r requirements.txt
 RUN python3 install_tools.py
-COPY simulations/run ${HOME}/bin/
+# FIXME: this is wrong!
+COPY run ${HOME}/bin/
 # shell setup
 WORKDIR /root
-COPY container/bash_aliases ${HOME}/.bash_aliases
+COPY bash_aliases ${HOME}/.bash_aliases
 CMD /bin/bash --init-file ${HOME}/.bashrc

@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   fogchains:
-    build: .
+    build: container/
     image: riccardolancellotti/fogchains
     container_name: fogchains
     volumes:
