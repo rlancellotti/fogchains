@@ -1,0 +1,15 @@
+#!/bin/sh
+cd `dirname $0`
+SRCPATH=${__fogchains_root_dir}/src
+SIMPATH=${__fogchains_root_dir}/simulations
+EXEPATH=${__fogchains_root_dir}/src
+if [ -n "${DEBUG}" ]
+then
+    echo "debug mode on"
+    EXENAME=${EXEPATH}/fogchains_dbg
+else
+    # echo "debug mode off"
+    EXENAME=${EXEPATH}/fogchains
+fi
+${EXENAME} -n ${SIMPATH}:${SRCPATH} $*
+# for shared lib, use: opp_run -l ../src/fogchains -n ${SIMPATH}:${SRCPATH} $*
