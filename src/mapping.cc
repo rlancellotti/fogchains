@@ -13,7 +13,7 @@ ServiceMapping::ServiceMapping(cValue *v){
         auto nnodes=nodes->size();
         for (int i=0; i<nnodes; i++){
           cValueMap *node=check_and_cast<cValueMap *>(nodes->get(i).objectValue());
-          addElement(node->get("id").intValue(), maxweight+node->get("weight").doubleValue());
+          addElement(node->get("id").intValue(), node->get("weight").doubleValue());
         }
     }
 }
