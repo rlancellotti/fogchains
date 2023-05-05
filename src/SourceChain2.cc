@@ -98,12 +98,6 @@ ChainJob *SourceChain2::createJob(){
     job->setOutputsArraySize(chainLenght+1); 
     job->setExitProbabilityArraySize(chainLenght+1); 
     job->setLastService(-1);
-    // FIXME: for each element of the array
-    // content is a cValueMap
-    // find:
-    // - suggestedTime
-    // - node
-    // - exitProbaiblity
     // NOTE: numbering start from 1 and goes to chainLenght
     // NOTE2: output -> node [i+1]. Output starts from 0 and goes to chainLenght-1
     job->setSuggestedTime(0, 0.0);
