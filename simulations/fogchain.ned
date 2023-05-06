@@ -21,7 +21,7 @@ import fog.DelayChain;
 import fog.PUChain;
 import fog.DispatcherChain;
 import fog.AppClassifier;
-
+import fog.MappingOracle;
 
 //
 // Sample network, consisting of a source and a sink.
@@ -33,9 +33,11 @@ network FogChain
         int nNodes;
         int nSrcPerChain = default(1);
         bool networkDelay = default(false);
+        bool enableMappingOracle = default(false);
         //string pustring=choose(int(networkDelay), "p=,,c p=,,ri");
     submodules:
         source[nChains*nSrcPerChain]: SourceChain2;
+        mappingOracle: MappingOracle if enableMappingOracle;
         delay[nNodes * nNodes]: DelayChain if networkDelay {
             parameters:
                 @display("p=,,c;is=vs");

@@ -39,7 +39,7 @@ simple SourceChain2
         double maxInterval @unit(s) = default(-1s);
         int appId = default(1);
         string jobName = default("job");
-        string mappingOracle = default("MappingOracle");
+        string mappingOracle = default("mappingOracle");
         int packetLength=default(1); 
     gates:
         output out;

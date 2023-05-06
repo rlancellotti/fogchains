@@ -2,10 +2,12 @@
 import json
 import math
 
-if hasattr(conf, 'files'):
-    files = conf.files
-else:
-    files = ['sample_output_0011.json', 'sample_output_0101.json', 'sample_output_0110.json']
+def get_conf(name, default):
+    if hasattr(conf, name): 
+        return getattr(conf, name)
+    else: return default
+
+files=get_conf('files', ['sample_output_0011.json', 'sample_output_0101.json', 'sample_output_0110.json'])
 
 # CoV of network delay
 delaycv=0.05 
@@ -59,7 +61,7 @@ def chain_description(c):
 %>\
 [General]
 network = fog.simulations.FogChain
-sim-time-limit = 108000s
+sim-time-limit = ${get_conf('simtime', 10800)}s
 cmdenv-config-name = FogChain
 qtenv-default-config = FogChain
 repeat = 5
@@ -79,6 +81,7 @@ nspc=get_nspc(sol['servicechain'])
 **.nChains=${nchains}
 **.nNodes=${nnodes}
 **.networkDelay=${'true' if 'network' in sol.keys() else 'false'}
+**.enableMappingOracle=${get_conf('enableMappingOracle', 'false')}
 **.nSrcPerChain=${nspc}
 **.solutionFile="${fname.removesuffix('.json')}"
 
