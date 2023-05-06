@@ -1,0 +1,112 @@
+mobility_static_balanced_nooracle:
+  log: 
+    name: "${testname}.log"
+    persist: false
+  env:
+    scenario: "mobility_static_balanced_solution"
+    placement: "${scenario}.json"
+    yamlconfig: "${testname}_config.yaml"
+    db: "${testname}.db"
+    config: "testing_config.json"
+    epsilon: 0.05
+    simtime: 300
+  commands:
+    - "unzip -o test_scenarios.zip ${placement}"
+    - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
+    - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
+    - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
+    - "update_template.py -c ${yamlconfig} -t ${config}.mako"
+    - "make_runfile.py -f fogchain.ini"
+    - "make -j $(nproc) -f Runfile"
+    - "parse_data.py -d ${db} -j $(nproc) -r -c ${config} results/${scenario}*.sca"
+    - "analyze_data.py -d ${db} -c ${config}"
+    - "rm ${yamlconfig} ${placement} ${db}"
+  expect: 
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b FogRho-F2 -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b 0.5 -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F2 -o eq -b 0.5 -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*10 | bc) -e ${epsilon}"
+mobility_static_balanced_oracle:
+  log:
+    name: "${testname}.log"
+    persist: false
+  env:
+    scenario: "mobility_static_balanced_solution"
+    placement: "${scenario}.json"
+    yamlconfig: "${testname}_config.yaml"
+    db: "${testname}.db"
+    config: "testing_config.json"
+    epsilon: 0.05
+    simtime: 300
+  commands:
+    - "unzip -o test_scenarios.zip ${placement}"
+    - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
+    - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
+    - "write_config.py -f ${yamlconfig} -k enableMappingOracle -v true"
+    - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
+    - "update_template.py -c ${yamlconfig} -t ${config}.mako"
+    - "make_runfile.py -f fogchain.ini"
+    - "make -j $(nproc) -f Runfile"
+    - "parse_data.py -d ${db} -j $(nproc) -r -c ${config} results/${scenario}*.sca"
+    - "analyze_data.py -d ${db} -c ${config}"
+    - "rm ${yamlconfig} ${placement} ${db}"
+  expect: 
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b FogRho-F2 -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b 0.5 -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F2 -o eq -b 0.5 -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*10 | bc) -e ${epsilon}"
+mobility_static_unbalanced_nooracle:
+  log: 
+    name: "${testname}.log"
+    persist: false
+  env:
+    scenario: "mobility_static_unbalanced_solution"
+    placement: "${scenario}.json"
+    yamlconfig: "${testname}_config.yaml"
+    db: "${testname}.db"
+    config: "testing_config.json"
+    epsilon: 0.05
+    simtime: 300
+  commands:
+    - "unzip -o test_scenarios.zip ${placement}"
+    - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
+    - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
+    - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
+    - "update_template.py -c ${yamlconfig} -t ${config}.mako"
+    - "make_runfile.py -f fogchain.ini"
+    - "make -j $(nproc) -f Runfile"
+    - "parse_data.py -d ${db} -j $(nproc) -r -c ${config} results/${scenario}*.sca"
+    - "analyze_data.py -d ${db} -c ${config}"
+    - "rm ${yamlconfig} ${placement} ${db}"
+  expect: 
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b 0.3333 -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F2 -o eq -b 0.6666 -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*10 | bc) -e ${epsilon}"
+mobility_static_unbalanced_oracle:
+  log: 
+    name: "${testname}.log"
+    persist: false
+  env:
+    scenario: "mobility_static_unbalanced_solution"
+    placement: "${scenario}.json"
+    yamlconfig: "${testname}_config.yaml"
+    db: "${testname}.db"
+    config: "testing_config.json"
+    epsilon: 0.05
+    simtime: 300
+  commands:
+    - "unzip -o test_scenarios.zip ${placement}"
+    - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
+    - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
+    - "write_config.py -f ${yamlconfig} -k enableMappingOracle -v true"
+    - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
+    - "update_template.py -c ${yamlconfig} -t ${config}.mako"
+    - "make_runfile.py -f fogchain.ini"
+    - "make -j $(nproc) -f Runfile"
+    - "parse_data.py -d ${db} -j $(nproc) -r -c ${config} results/${scenario}*.sca"
+    - "analyze_data.py -d ${db} -c ${config}"
+    - "rm ${yamlconfig} ${placement} ${db}"
+  expect: 
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b 0.3333 -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F2 -o eq -b 0.6666 -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*10 | bc) -e ${epsilon}"
