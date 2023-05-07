@@ -1,3 +1,60 @@
+MM1:
+  env:
+    scenario: "MM1_solution"
+    placement: "${scenario}.json"
+    yamlconfig: "${testname}_config.yaml"
+    db: "${testname}.db"
+    config: "testing_config.json"
+    epsilon: 0.05
+    simtime: 1200
+    mu: 10
+    lambda: 8
+  commands:
+    - "unzip -o test_scenarios.zip ${placement}"
+    - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
+    - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
+    - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
+    - "update_template.py -c ${yamlconfig} -t ${config}.mako"
+    - "make_runfile.py -f fogchain.ini"
+    - "make -j $(nproc) -f Runfile"
+    - "parse_data.py -d ${db} -j $(nproc) -r -c ${config} results/${scenario}*.sca"
+    - "analyze_data.py -d ${db} -c ${config}"
+    - "rm ${yamlconfig} ${placement} ${db}"
+  expect: 
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b 0.8 -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*8 | bc) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTResp-SC1 -o eq -b $(echo \"scale=4; 1/(${mu}-${lambda})\" | bc) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; ${lambda}/(${mu}*(${mu}-${lambda}))\" | bc) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b 0.1 -e ${epsilon}"
+MG1:
+  env:
+    scenario: "MG1_solution"
+    placement: "${scenario}.json"
+    yamlconfig: "${testname}_config.yaml"
+    db: "${testname}.db"
+    config: "testing_config.json"
+    epsilon: 0.1
+    simtime: 1200
+    mu: 10
+    lambda: 8
+    rho: 0.8
+    cv: 0.1
+  commands:
+    - "unzip -o test_scenarios.zip ${placement}"
+    - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
+    - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
+    - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
+    - "update_template.py -c ${yamlconfig} -t ${config}.mako"
+    - "make_runfile.py -f fogchain.ini"
+    - "make -j $(nproc) -f Runfile"
+    - "parse_data.py -d ${db} -j $(nproc) -r -c ${config} results/${scenario}*.sca"
+    - "analyze_data.py -d ${db} -c ${config}"
+    - "rm ${yamlconfig} ${placement} ${db}"
+  expect: 
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b ${rho} -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*${lambda} | bc) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; 1/${mu} * (1+${cv})/2 * ${rho}/(1-${rho})\" | bc) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b $(echo \"scale=4; 1/${mu}\" | bc) -e ${epsilon}"
 mobility_static_balanced_nooracle:
   log: 
     name: "${testname}.log"
