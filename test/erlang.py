@@ -35,4 +35,4 @@ if __name__ == '__main__':
     if args.type == 'B':
         print(ErlangB(args.E, args.m))
     if args.type == 'C':
-        print(ErlangB(args.A, args.N))
+        print(ErlangC(args.A, args.N))
