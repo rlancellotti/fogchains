@@ -1,3 +1,5 @@
+env:
+  testdir: "../test"
 MM1:
   env:
     scenario: "MM1_solution"
@@ -10,7 +12,7 @@ MM1:
     mu: 10
     lambda: 8
   commands:
-    - "unzip -o test_scenarios.zip ${placement}"
+    - "cp ${testdir}/${placement} ."
     - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
     - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
     - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
@@ -26,21 +28,21 @@ MM1:
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTResp-SC1 -o eq -b $(echo \"scale=4; 1/(${mu}-${lambda})\" | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; ${lambda}/(${mu}*(${mu}-${lambda}))\" | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b 0.1 -e ${epsilon}"
-MG1:
+MG1cv01:
   env:
-    scenario: "MG1_solution"
+    scenario: "MG1cv01_solution"
     placement: "${scenario}.json"
     yamlconfig: "${testname}_config.yaml"
     db: "${testname}.db"
     config: "testing_config.json"
-    epsilon: 0.1
+    epsilon: 0.05
     simtime: 1200
     mu: 10
     lambda: 8
     rho: 0.8
     cv: 0.1
   commands:
-    - "unzip -o test_scenarios.zip ${placement}"
+    - "cp ${testdir}/${placement} ."
     - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
     - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
     - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
@@ -53,7 +55,67 @@ MG1:
   expect: 
     - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b ${rho} -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*${lambda} | bc) -e ${epsilon}"
-    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; 1/${mu} * (1+${cv})/2 * ${rho}/(1-${rho})\" | bc) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; 1/${mu} * (1+${cv}*${cv})/2 * ${rho}/(1-${rho})\" | bc) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b $(echo \"scale=4; 1/${mu}\" | bc) -e ${epsilon}"
+MG1cv20:
+  env:
+    scenario: "MG1cv20_solution"
+    placement: "${scenario}.json"
+    yamlconfig: "${testname}_config.yaml"
+    db: "${testname}.db"
+    config: "testing_config.json"
+    epsilon: 0.05
+    simtime: 5400
+    mu: 10
+    lambda: 8
+    rho: 0.8
+    cv: 2.0
+  commands:
+    - "cp ${testdir}/${placement} ."
+    - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
+    - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
+    - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
+    - "update_template.py -c ${yamlconfig} -t ${config}.mako"
+    - "make_runfile.py -f fogchain.ini"
+    - "make -j $(nproc) -f Runfile"
+    - "parse_data.py -d ${db} -j $(nproc) -r -c ${config} results/${scenario}*.sca"
+    - "analyze_data.py -d ${db} -c ${config}"
+    - "rm ${yamlconfig} ${placement} ${db}"
+  expect: 
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b ${rho} -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*${lambda} | bc) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; 1/${mu} * (1+${cv}*${cv})/2 * ${rho}/(1-${rho})\" | bc) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b $(echo \"scale=4; 1/${mu}\" | bc) -e ${epsilon}"
+multicore_rho01:
+  env:
+    scenario: "multicore_rho01_solution"
+    placement: "${scenario}.json"
+    yamlconfig: "${testname}_config.yaml"
+    db: "${testname}.db"
+    config: "testing_config.json"
+    epsilon: 0.1
+    simtime: 1200
+    mu: 10
+    lambda: 30
+    # lambda=30, mu=10-> A=lambda/mu=3 
+    A: 3
+    ncores: 4
+  commands:
+    - "cp ${testdir}/${placement} ."
+    - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
+    - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
+    - "write_config.py -f ${yamlconfig} -k ncores -v ${ncores}"
+    - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
+    - "update_template.py -c ${yamlconfig} -t ${config}.mako"
+    - "make_runfile.py -f fogchain.ini"
+    - "make -j $(nproc) -f Runfile"
+    - "parse_data.py -d ${db} -j $(nproc) -r -c ${config} results/${scenario}*.sca"
+    - "analyze_data.py -d ${db} -c ${config}"
+    - "rm ${yamlconfig} ${placement} ${db}"
+  expect: 
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b ${A} -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*${lambda} | bc) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; $(${testdir}/erlang.py -t C -A ${A} -N ${ncores})/(${ncores} * ${mu} - ${lambda})\" | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b $(echo \"scale=4; 1/${mu}\" | bc) -e ${epsilon}"
 mobility_static_balanced_nooracle:
   log: 
@@ -68,7 +130,7 @@ mobility_static_balanced_nooracle:
     epsilon: 0.05
     simtime: 300
   commands:
-    - "unzip -o test_scenarios.zip ${placement}"
+    - "cp ${testdir}/${placement} ."
     - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
     - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
     - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
@@ -96,7 +158,7 @@ mobility_static_balanced_oracle:
     epsilon: 0.05
     simtime: 300
   commands:
-    - "unzip -o test_scenarios.zip ${placement}"
+    - "cp ${testdir}/${placement} ."
     - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
     - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
     - "write_config.py -f ${yamlconfig} -k enableMappingOracle -v true"
@@ -125,7 +187,7 @@ mobility_static_unbalanced_nooracle:
     epsilon: 0.05
     simtime: 300
   commands:
-    - "unzip -o test_scenarios.zip ${placement}"
+    - "cp ${testdir}/${placement} ."
     - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
     - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
     - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
@@ -152,7 +214,7 @@ mobility_static_unbalanced_oracle:
     epsilon: 0.05
     simtime: 300
   commands:
-    - "unzip -o test_scenarios.zip ${placement}"
+    - "cp ${testdir}/${placement} ."
     - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
     - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
     - "write_config.py -f ${yamlconfig} -k enableMappingOracle -v true"

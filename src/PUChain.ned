@@ -1,12 +1,23 @@
 
 package fog;
 
+moduleinterface IPUChain{
+    parameters:
+        int ncores;
+        double speedup;
+        int capacity;
+    gates:
+        input in[];
+        output out;
+}
+
 //
 // processing unit with a queue
 //
-simple PUChain
+simple PUChain like IPUChain
 {
     parameters:
+        @class(PUChain);
         @display("i=block/activeq;q=queue");
         @signal[dropped](type="long");
         @signal[queueLength](type="long");
@@ -20,6 +31,7 @@ simple PUChain
         @statistic[serviceTime](title="service time";record=vector?,stats,histogram;unit=s;interpolationmode=none);
         @statistic[interarrivalTime](title="inter-arrival time";record=vector?,stats,histogram;unit=s;interpolationmode=none);
         @statistic[busy](title="server busy state";record=vector?,timeavg;interpolationmode=sample-hold);
+        int ncores = default(1);    //number of cores (used only in subclasses)
         double speedup = default(1.0);  //speedup: suggested time is divided by speedup value
         int capacity = default(-1);    // negative capacity means unlimited queue
         //string pudisplay = default("c");

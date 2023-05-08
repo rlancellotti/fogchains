@@ -18,7 +18,9 @@ package fog.simulations;
 import fog.SourceChain2;
 import fog.SinkChain;
 import fog.DelayChain;
+import fog.IPUChain;
 import fog.PUChain;
+import fog.PUChainMCore;
 import fog.DispatcherChain;
 import fog.AppClassifier;
 import fog.MappingOracle;
@@ -48,7 +50,7 @@ network FogChain
             gates:
                 out[parent.nNodes];
         };
-        pu[nNodes]: PUChain {
+        pu[nNodes]: <default("PUChain")> like IPUChain{
             parameters:
                 @display("p=,,c");
                 //pudisplay = parent.networkDelay?",,c":",,ri";

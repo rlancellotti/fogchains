@@ -84,6 +84,10 @@ nspc=get_nspc(sol['servicechain'])
 **.enableMappingOracle=${get_conf('enableMappingOracle', 'false')}
 **.nSrcPerChain=${nspc}
 **.solutionFile="${fname.removesuffix('.json')}"
+%if int(get_conf('ncores', '1')) > 1:
+**.pu[*].typename="PUChainMCore"
+**.pu[*].ncores = ${get_conf('ncores', '1')}
+%endif
 
 # Fog nodes
 %for i, f in enumerate(sol['fog']):
