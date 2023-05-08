@@ -1,14 +1,20 @@
 env:
   testdir: "../test"
+  epsilon: 0.05
+  simtime: 1200
 MM1:
+  # Just an example of the defaults to control logging
+  log: 
+    name: "${testname}.log"
+    # persist=true -> logs are kept
+    # persist=false -> remove log unless an error/failure occurs 
+    persist: false
   env:
     scenario: "MM1_solution"
     placement: "${scenario}.json"
     yamlconfig: "${testname}_config.yaml"
     db: "${testname}.db"
     config: "testing_config.json"
-    epsilon: 0.05
-    simtime: 1200
     mu: 10
     lambda: 8
   commands:
@@ -35,8 +41,6 @@ MG1cv01:
     yamlconfig: "${testname}_config.yaml"
     db: "${testname}.db"
     config: "testing_config.json"
-    epsilon: 0.05
-    simtime: 1200
     mu: 10
     lambda: 8
     rho: 0.8
@@ -64,7 +68,6 @@ MG1cv20:
     yamlconfig: "${testname}_config.yaml"
     db: "${testname}.db"
     config: "testing_config.json"
-    epsilon: 0.05
     simtime: 5400
     mu: 10
     lambda: 8
@@ -86,15 +89,43 @@ MG1cv20:
     - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*${lambda} | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; 1/${mu} * (1+${cv}*${cv})/2 * ${rho}/(1-${rho})\" | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b $(echo \"scale=4; 1/${mu}\" | bc) -e ${epsilon}"
-multicore_rho01:
+multicore_A05:
   env:
-    scenario: "multicore_rho01_solution"
+    scenario: "multicore_A05_solution"
     placement: "${scenario}.json"
     yamlconfig: "${testname}_config.yaml"
     db: "${testname}.db"
     config: "testing_config.json"
-    epsilon: 0.1
     simtime: 1200
+    mu: 10
+    lambda: 5
+    # lambda=5, mu=10-> A=lambda/mu=0.5
+    A: 0.5
+    ncores: 4
+  commands:
+    - "cp ${testdir}/${placement} ."
+    - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
+    - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
+    - "write_config.py -f ${yamlconfig} -k ncores -v ${ncores}"
+    - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
+    - "update_template.py -c ${yamlconfig} -t ${config}.mako"
+    - "make_runfile.py -f fogchain.ini"
+    - "make -j $(nproc) -f Runfile"
+    - "parse_data.py -d ${db} -j $(nproc) -r -c ${config} results/${scenario}*.sca"
+    - "analyze_data.py -d ${db} -c ${config}"
+    - "rm ${yamlconfig} ${placement} ${db}"
+  expect: 
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b ${A} -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*${lambda} | bc) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; $(${testdir}/erlang.py -t C -A ${A} -N ${ncores})/(${ncores} * ${mu} - ${lambda})\" | bc) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b $(echo \"scale=4; 1/${mu}\" | bc) -e ${epsilon}"
+multicore_A30:
+  env:
+    scenario: "multicore_A30_solution"
+    placement: "${scenario}.json"
+    yamlconfig: "${testname}_config.yaml"
+    db: "${testname}.db"
+    config: "testing_config.json"
     mu: 10
     lambda: 30
     # lambda=30, mu=10-> A=lambda/mu=3 
@@ -118,16 +149,12 @@ multicore_rho01:
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; $(${testdir}/erlang.py -t C -A ${A} -N ${ncores})/(${ncores} * ${mu} - ${lambda})\" | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b $(echo \"scale=4; 1/${mu}\" | bc) -e ${epsilon}"
 mobility_static_balanced_nooracle:
-  log: 
-    name: "${testname}.log"
-    persist: false
   env:
     scenario: "mobility_static_balanced_solution"
     placement: "${scenario}.json"
     yamlconfig: "${testname}_config.yaml"
     db: "${testname}.db"
     config: "testing_config.json"
-    epsilon: 0.05
     simtime: 300
   commands:
     - "cp ${testdir}/${placement} ."
@@ -146,16 +173,12 @@ mobility_static_balanced_nooracle:
     - "check_assert.py -f analysis/${scenario}.data -a FogRho-F2 -o eq -b 0.5 -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*10 | bc) -e ${epsilon}"
 mobility_static_balanced_oracle:
-  log:
-    name: "${testname}.log"
-    persist: false
   env:
     scenario: "mobility_static_balanced_solution"
     placement: "${scenario}.json"
     yamlconfig: "${testname}_config.yaml"
     db: "${testname}.db"
     config: "testing_config.json"
-    epsilon: 0.05
     simtime: 300
   commands:
     - "cp ${testdir}/${placement} ."
@@ -175,16 +198,12 @@ mobility_static_balanced_oracle:
     - "check_assert.py -f analysis/${scenario}.data -a FogRho-F2 -o eq -b 0.5 -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*10 | bc) -e ${epsilon}"
 mobility_static_unbalanced_nooracle:
-  log: 
-    name: "${testname}.log"
-    persist: false
   env:
     scenario: "mobility_static_unbalanced_solution"
     placement: "${scenario}.json"
     yamlconfig: "${testname}_config.yaml"
     db: "${testname}.db"
     config: "testing_config.json"
-    epsilon: 0.05
     simtime: 300
   commands:
     - "cp ${testdir}/${placement} ."
@@ -202,16 +221,12 @@ mobility_static_unbalanced_nooracle:
     - "check_assert.py -f analysis/${scenario}.data -a FogRho-F2 -o eq -b 0.6666 -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*10 | bc) -e ${epsilon}"
 mobility_static_unbalanced_oracle:
-  log: 
-    name: "${testname}.log"
-    persist: false
   env:
     scenario: "mobility_static_unbalanced_solution"
     placement: "${scenario}.json"
     yamlconfig: "${testname}_config.yaml"
     db: "${testname}.db"
     config: "testing_config.json"
-    epsilon: 0.05
     simtime: 300
   commands:
     - "cp ${testdir}/${placement} ."
