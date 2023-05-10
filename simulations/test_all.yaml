@@ -89,6 +89,37 @@ MG1cv20:
     - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*${lambda} | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; 1/${mu} * (1+${cv}*${cv})/2 * ${rho}/(1-${rho})\" | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b $(echo \"scale=4; 1/${mu}\" | bc) -e ${epsilon}"
+MG1_mog2srv:
+  env:
+    scenario: "mog_solution"
+    placement: "${scenario}.json"
+    yamlconfig: "${testname}_config.yaml"
+    db: "${testname}.db"
+    config: "testing_config.json"
+    simtime: 1200
+  commands:
+    - "cp ${testdir}/${placement} ."
+    - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
+    - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
+    - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
+    - "update_template.py -c ${yamlconfig} -t ${config}.mako"
+    - "make_runfile.py -f fogchain.ini"
+    - "make -j $(nproc) -f Runfile"
+    - "parse_data.py -d ${db} -j $(nproc) -r -c ${config} results/${scenario}*.sca"
+    - "analyze_data.py -d ${db} -c ${config}"
+    - "rm ${yamlconfig} ${db}"
+  expect: 
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b $(jq .fog.F1.rho ${placement}) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a FogTSrv-F1 -o eq -b $(jq .fog.F1.tserv ${placement}) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a FogStdTSrv-F1 -o eq -b $(jq .fog.F1.stddev ${placement}) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a FogTWait-F1 -o eq -b $(jq .fog.F1.twait ${placement}) -e ${epsilon}"
+    #- "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*${lambda} | bc) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTResp-SC1 -o eq -b $(jq .servicechain.SC1.resptime ${placement}) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(jq .servicechain.SC1.waittime ${placement}) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b $(jq .servicechain.SC1.servicetime ${placement}) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTResp-SC2 -o eq -b $(jq .servicechain.SC2.resptime ${placement}) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC2 -o eq -b $(jq .servicechain.SC2.waittime ${placement}) -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC2 -o eq -b $(jq .servicechain.SC2.servicetime ${placement}) -e ${epsilon}"
 multicore_A05:
   env:
     scenario: "multicore_A05_solution"
