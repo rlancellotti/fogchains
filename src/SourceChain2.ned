@@ -15,12 +15,14 @@
 
 package fog;
 
+import PositionModule;
+
 //
 // Generates messages with a configurable interarrival time.
 //
-simple SourceChain2
-{
+simple SourceChain2 extends PositionModule {
     parameters:
+        @class(SourceChain2);
         @display("i=block/source");
         @signal[sentJob](type="long");
         @statistic[sentJob](title="sent event";record=vector?,count;interpolationmode=none);

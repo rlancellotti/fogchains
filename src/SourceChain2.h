@@ -21,6 +21,7 @@
 #include "ChainJob_m.h"
 #include "mapping.h"
 #include "MappingOracle.h"
+#include "PositionModule.h"
 
 using namespace omnetpp;
 namespace fog {
@@ -28,7 +29,7 @@ namespace fog {
 /**
  * Generates messages; see NED file for more info.
  */
-class SourceChain2 : public cSimpleModule
+class SourceChain2 : public PositionModule
 {
   private:
     cMessage *timerMessage;

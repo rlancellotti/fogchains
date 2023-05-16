@@ -32,6 +32,7 @@ SourceChain2::~SourceChain2()
 
 void SourceChain2::initialize()
 {
+    PositionModule::initialize();
     startTime = par("startTime");
     stopTime = par("stopTime");
     timerMessage = new cMessage("timer");
