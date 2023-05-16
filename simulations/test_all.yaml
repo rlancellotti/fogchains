@@ -2,6 +2,7 @@ env:
   testdir: "../test"
   epsilon: 0.05
   simtime: 1200
+# Standard validation with queuing theory results
 MM1:
   # Just an example of the defaults to control logging
   log: 
@@ -89,6 +90,7 @@ MG1cv20:
     - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*${lambda} | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; 1/${mu} * (1+${cv}*${cv})/2 * ${rho}/(1-${rho})\" | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b $(echo \"scale=4; 1/${mu}\" | bc) -e ${epsilon}"
+# Check service with multi-class workload: mixture of distibutions
 MG1_mog2srv:
   env:
     scenario: "mog_solution"
@@ -120,6 +122,7 @@ MG1_mog2srv:
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTResp-SC2 -o eq -b $(jq .servicechain.SC2.resptime ${placement}) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC2 -o eq -b $(jq .servicechain.SC2.waittime ${placement}) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC2 -o eq -b $(jq .servicechain.SC2.servicetime ${placement}) -e ${epsilon}"
+# Validation with M/M/n
 multicore_A05:
   env:
     scenario: "multicore_A05_solution"
@@ -179,6 +182,7 @@ multicore_A30:
     - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*${lambda} | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; $(${testdir}/erlang.py -t C -A ${A} -N ${ncores})/(${ncores} * ${mu} - ${lambda})\" | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b $(echo \"scale=4; 1/${mu}\" | bc) -e ${epsilon}"
+# Validation of load distribution across multiple nodes
 mobility_static_balanced_nooracle:
   env:
     scenario: "mobility_static_balanced_solution"
