@@ -22,6 +22,7 @@ fi
 
 # check if omnet environement is set
 if [ -z "$__omnetpp_root_dir" ] ; then
+    fcdir=${dir}
     OPP_CANDIDATE=$(ls .. | grep omnetpp-6 | head -n1)
     if [ -f "../${OPP_CANDIDATE}/setenv" ] ; then
       echo "Setting OMNeT++ environment form ..${OPP_CANDIDATE}"
@@ -30,10 +31,8 @@ if [ -z "$__omnetpp_root_dir" ] ; then
       echo "Error: OMNeT++ environemnt is not set"
       return 1
     fi
+    dir=${fcdir}
 fi
-
-#FIXME: set environemnt
-
 export __fogchains_root_dir=${dir}
 
 if [ "$1" != "-q" ]; then
