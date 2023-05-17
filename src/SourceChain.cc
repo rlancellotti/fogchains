@@ -22,7 +22,7 @@ Define_Module(SourceChain);
 
 SourceChain::SourceChain()
 {
-    timerMessage = NULL;
+    timerMessage = nullptr;
 }
 
 SourceChain::~SourceChain()
@@ -32,6 +32,7 @@ SourceChain::~SourceChain()
 
 void SourceChain::initialize()
 {
+    PositionModule::initialize();
     startTime = par("startTime");
     stopTime = par("stopTime");
     timerMessage = new cMessage("timer");
@@ -40,6 +41,82 @@ void SourceChain::initialize()
     if (startTime>=0) {
         scheduleJob(startTime);
     }
+    cModule *mod=findModuleByPath(par("mappingOracle"));
+    if (mod!=nullptr){
+        mappingOracle=check_and_cast<MappingOracle *>(mod);
+    }
+    cValueArray* chain=check_and_cast<cValueArray *>(par("chain").objectValue());
+    int chainLenght=getChainLength(chain);
+    for (int i=0; i<chainLenght; i++){
+        cValueMap *service=check_and_cast<cValueMap *>(chain->get(i).objectValue());
+        cValue nodes=service->get("node");
+        if (mappingOracle==nullptr){
+            ServiceMapping *srv=new ServiceMapping(&nodes);
+            srv->setComponent(this);
+            mapping.push_back(srv);
+        } else {
+            //register the services to the mapping oracle
+            const char *srvName=service->get("srvName").stringValue();
+            srvNames.push_back(srvName);
+            mappingOracle->registerService(srvName, &nodes);
+        }
+    }
+}
+
+long int SourceChain::getChainLength(cValueArray *chain){
+    return chain->size();
+}
+
+double SourceChain::getFloatChainParam(cValueArray *chain, int idx, const char *param){
+    cValueMap *map=check_and_cast<cValueMap *>(chain->get(idx).objectValue());
+    return map->get(param).doubleValue();
+}
+
+long int SourceChain::getNode(int idx){
+    // if we have mapping oracle, ask the oracle
+    // otherwise, find the right mapping ans ask the service mapping
+    if (mappingOracle==nullptr){
+        return mapping[idx]->getRandomNode();
+    } else {
+        // FIXME: must return name of the service
+        return mappingOracle->getNodeForService(srvNames[idx]);
+    }
+}
+
+ChainJob *SourceChain::createJob(){
+    // create new message
+    ChainJob *job = new ChainJob(getJobName());
+    job->setStartTime(simTime());
+    job->setQueuingTime(0.0);
+    job->setServiceTime(0.0);
+    job->setDelayTime(0.0);
+    job->setQueueCount(0);
+    job->setDelayCount(0);
+    job->setAppId(par("appId").intValue());
+    cValueArray* chain=check_and_cast<cValueArray *>(par("chain").objectValue());
+    int chainLenght=getChainLength(chain);
+    job->setSuggestedTimeArraySize(chainLenght+1); 
+    job->setOutputsArraySize(chainLenght+1); 
+    job->setExitProbabilityArraySize(chainLenght+1); 
+    job->setLastService(-1);
+    // NOTE: numbering start from 1 and goes to chainLenght
+    // NOTE2: output -> node [i+1]. Output starts from 0 and goes to chainLenght-1
+    job->setSuggestedTime(0, 0.0);
+    job->setExitProbability(0, 0.0);
+    job->setOutputs(chainLenght, -1);
+    for (int i=0; i<chainLenght; i++){
+        job->setSuggestedTime(i+1, getFloatChainParam(chain, i, "suggestedTime"));
+        job->setExitProbability(i+1, getFloatChainParam(chain, i, "exitProbability"));
+        //EV << "exit probability["<< i+1 <<"]: " << job->getExitProbability(i+1)<<endl;
+        job->setOutputs(i, getNode(i));
+    }
+    if (par("suggestedDeadline").doubleValue()>0.0){
+        job->setSlaDeadline(simTime()+par("suggestedDeadline"));
+    } else {
+        job->setSlaDeadline(-1.0);
+    }
+    job->setByteLength(par("packetLength"));
+    return job;
 }
 
 /**
@@ -55,41 +132,7 @@ void SourceChain::handleMessage(cMessage *msg)
         EV<<this->getFullName()<<" discarding event because sourc already stopped"<<endl;
         return;
     }
-    // create new message
-    ChainJob *job = new ChainJob(getJobName());
-    job->setStartTime(simTime());
-    job->setQueuingTime(0.0);
-    job->setServiceTime(0.0);
-    job->setDelayTime(0.0);
-    job->setQueueCount(0);
-    job->setDelayCount(0);
-    job->setAppId(par("appId").intValue());
-    int chainLenght=par("chainLenght").intValue();
-    job->setSuggestedTimeArraySize(chainLenght+1); 
-    job->setOutputsArraySize(chainLenght+1); 
-    job->setExitProbabilityArraySize(chainLenght+1); 
-    job->setLastService(-1);
-    for (int i=0; i<chainLenght+1; i++){
-        if (i>0) {
-            std::string partimename = "suggestedTime_" + std::to_string(i);
-            job->setSuggestedTime(i, par(partimename.c_str()));
-            std::string parexitname = "exitProbability_" + std::to_string(i);
-            job->setExitProbability(i, par(parexitname.c_str()));
-        } else {
-            job->setSuggestedTime(i, 0.0);
-            job->setExitProbability(i, 0.0);
-        }
-        std::string paroutname = "output_" + std::to_string(i);
-        job->setOutputs(i, par(paroutname.c_str()).intValue());
-    }
-    if (par("suggestedDeadline").doubleValue()>0.0){
-        job->setSlaDeadline(simTime()+par("suggestedDeadline"));
-    } else {
-        job->setSlaDeadline(-1.0);
-    }
-    job->setByteLength(par("packetLength"));
-    //EV << "ID is: "<< job->getId() <<endl;
-    //job->setId(nextJobId++);
+    ChainJob *job=createJob();
     send(job, "out");
     emit(sentJobSignal, 1);
     // schedule next message

@@ -15,7 +15,7 @@
 
 package fog.simulations;
 
-import fog.SourceChain2;
+import fog.SourceChain;
 import fog.SinkChain;
 import fog.DelayChain;
 import fog.IPUChain;
@@ -38,7 +38,7 @@ network FogChain
         bool enableMappingOracle = default(false);
         //string pustring=choose(int(networkDelay), "p=,,c p=,,ri");
     submodules:
-        source[nChains*nSrcPerChain]: SourceChain2;
+        source[nChains*nSrcPerChain]: SourceChain;
         mappingOracle: MappingOracle if enableMappingOracle;
         delay[nNodes * nNodes]: DelayChain if networkDelay {
             parameters:

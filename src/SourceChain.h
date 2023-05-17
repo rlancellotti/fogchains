@@ -17,14 +17,19 @@
 #define __SOURCECHAIN_H
 
 #include <omnetpp.h>
-using namespace omnetpp;
+#include <vector>
+#include "ChainJob_m.h"
+#include "mapping.h"
+#include "MappingOracle.h"
+#include "PositionModule.h"
 
+using namespace omnetpp;
 namespace fog {
 
 /**
  * Generates messages; see NED file for more info.
  */
-class SourceChain : public cSimpleModule
+class SourceChain : public PositionModule
 {
   private:
     cMessage *timerMessage;
@@ -32,15 +37,23 @@ class SourceChain : public cSimpleModule
     simtime_t startTime;
     simtime_t stopTime;
     simsignal_t sentJobSignal;
+    MappingOracle *mappingOracle=nullptr;
+    std::vector<ServiceMapping *>mapping;
+    std::vector<const char *>srvNames;
+
 
   public:
-     SourceChain();
-     virtual ~SourceChain();
-     const char *getJobName();
+    SourceChain();
+    virtual ~SourceChain();
+    const char *getJobName();
 
   protected:
-    virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
+    virtual void initialize() override;
+    virtual void handleMessage(cMessage *msg) override;
+    virtual ChainJob *createJob();
+    virtual long int getChainLength(cValueArray *chain);
+    virtual long int getNode(int idx);
+    virtual double getFloatChainParam(cValueArray *chain, int idx, const char *param);
     virtual void scheduleJob(simtime_t offset);
 };
 
