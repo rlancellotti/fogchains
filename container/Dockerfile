@@ -14,7 +14,7 @@ WORKDIR ${__fogchains_root_dir}
 RUN make makefiles && make -j $(nproc)
 # install tools
 WORKDIR ${HOME}
-RUN apt update && apt install -y libsqlite3-dev vim less
+RUN apt update && apt install -y libsqlite3-dev vim less bc jq
 RUN git clone https://github.com/rlancellotti/omnet_analyzer.git
 WORKDIR ${HOME}/omnet_analyzer/
 RUN pip3 install -r requirements.txt
