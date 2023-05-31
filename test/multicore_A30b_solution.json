@@ -1,0 +1,33 @@
+{
+  "servicechain": {
+    "SC1": {
+      "services": {
+        "MS1_1": {
+          "meanserv": 0.1
+        }
+      },
+      "sensors": [
+        "S1"
+      ],
+      "sources": [
+        {
+          "startTime": 0,
+          "stopTime": -1,
+          "lambda": 30
+        }
+      ]
+    }
+  },
+  "microservice": {
+    "MS1_1": ["F1"]
+  },
+  "sensor": {
+    "S1": "F1"
+  },
+  "fog": {
+    "F1": {
+      "capacity": 1.0,
+      "ncores": 4
+    }
+  }
+}

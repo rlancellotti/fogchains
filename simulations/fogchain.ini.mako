@@ -57,7 +57,6 @@ def chain_description(c):
         #print(chain)
     return chain
 
-
 %>\
 [General]
 network = fog.simulations.FogChain
@@ -84,15 +83,20 @@ nspc=get_nspc(sol['servicechain'])
 **.enableMappingOracle=${get_conf('enableMappingOracle', 'false')}
 **.nSrcPerChain=${nspc}
 **.solutionFile="${fname.removesuffix('.json')}"
-%if int(get_conf('ncores', '1')) > 1:
-**.pu[*].typename="PUChainMCore"
-**.pu[*].ncores = ${get_conf('ncores', '1')}
-%endif
 
 # Fog nodes
 %for i, f in enumerate(sol['fog']):
 **.pu[${i}].speedup = ${sol['fog'][f]['capacity']} # fog node ${f}
-<% foglookup[f]=i %>\
+<% 
+foglookup[f]=i 
+ncores = int(get_conf('ncores', '1'))
+if 'ncores' in sol['fog'][f].keys():
+    ncores = int(sol['fog'][f]['ncores'])
+%>\
+%if ncores > 1:
+**.pu[${i}].typename="PUChainMCore"
+**.pu[${i}].ncores = ${ncores}
+%endif
 %endfor
 
 %for i, c in enumerate(sol['servicechain']):
