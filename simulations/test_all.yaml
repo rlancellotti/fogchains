@@ -206,12 +206,36 @@ multicore_A30b: # alternate notation for placing heterogeneous number of cores i
     - "analyze_data.py -d ${db} -c ${config}"
     - "rm ${yamlconfig} ${placement} ${db}"
   expect: 
-    - "grep -c 'pu\\[0\\].ncores = 4' fogchain.ini"
+    - "grep -c 'pu\\[0\\].ncores = ${ncores}' fogchain.ini"
     - "check_assert.py -f analysis/${scenario}.data -a FogRho-F1 -o eq -b ${A} -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b $(echo ${simtime}*${lambda} | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTWait-SC1 -o eq -b $(echo \"scale=4; $(${testdir}/erlang.py -t C -A ${A} -N ${ncores})/(${ncores} * ${mu} - ${lambda})\" | bc) -e ${epsilon}"
     - "check_assert.py -f analysis/${scenario}.data -a SinkChainTSrv-SC1 -o eq -b $(echo \"scale=4; 1/${mu}\" | bc) -e ${epsilon}"
-
+# scenarios for simulation with PoliMi RL framework
+polimi1:
+  env:
+    scenario: "fog_polimi"
+    placement: "${scenario}.json"
+    yamlconfig: "${testname}_config.yaml"
+    db: "${testname}.db"
+    config: "testing_config.json"
+    simtime: 10800
+  commands:
+    - "cp ${testdir}/${placement} ."
+    - "write_config.py -r -f ${yamlconfig} -k files -v \"[ ${placement} ]\""
+    - "write_config.py -f ${yamlconfig} -k simtime -v ${simtime}"
+    - "update_template.py -c ${yamlconfig} -t fogchain.ini.mako"
+    - "update_template.py -c ${yamlconfig} -t ${config}.mako"
+    - "make_runfile.py -f fogchain.ini"
+    - "make -j $(nproc) -f Runfile"
+    - "parse_data.py -d ${db} -j $(nproc) -r -c ${config} results/${scenario}*.sca"
+    - "analyze_data.py -d ${db} -c ${config}"
+    - "rm ${yamlconfig} ${placement} ${db}"
+  expect: 
+    - "grep -c 'pu\\[22\\].ncores = 4' fogchain.ini"
+    - "grep -c 'pu\\[23\\].ncores = 4' fogchain.ini"
+    - "check_assert.py -f analysis/${scenario}.data -a FogRho-Drone2 -o eq -b 0.0002 -e ${epsilon}"
+    - "check_assert.py -f analysis/${scenario}.data -a SrcSent-SC1-0 -o eq -b 0.0 -e ${epsilon}"
 # Validation of load distribution across multiple nodes
 mobility_static_balanced_nooracle:
   env:
