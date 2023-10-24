@@ -1,2 +1,4 @@
 files:
-  - sample_paper_solution.json
+  - iot2_output.json
+    #- fog_polimi.json
+simtime: 10800

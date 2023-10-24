@@ -48,3 +48,5 @@ simulations/*.yaml
 container/setup_container.sh
 src/*.drawio.*
 src/*.drawio
+simulations/time.txt
+simulations/times.data

@@ -23,7 +23,7 @@ fi
 # check if omnet environement is set
 if [ -z "$__omnetpp_root_dir" ] ; then
     fcdir=${dir}
-    OPP_CANDIDATE=$(ls .. | grep omnetpp-6 | head -n1)
+    OPP_CANDIDATE=$(ls .. | grep omnetpp-6 | tail -n1)
     if [ -f "../${OPP_CANDIDATE}/setenv" ] ; then
       echo "Setting OMNeT++ environment form ..${OPP_CANDIDATE}"
       source ../${OPP_CANDIDATE}/setenv 
