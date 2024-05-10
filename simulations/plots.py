@@ -8,14 +8,14 @@ import matplotlib as mpl
 import matplotlib.colors as mc
 #import pathlib
 
-def set_fonts():
+def set_fonts(font_size=14):
     """ 
     Set LaTeX-friendly fonts. Call this function at the beginning of your code
     """
     mpl.rcParams['font.family'] = 'Nimbus Sans'
     mpl.rcParams["figure.autolayout"] = True
     mpl.rc('text', usetex=True)
-    mpl.rcParams.update({'font.size': 10})
+    mpl.rcParams.update({'font.size': font_size})
 
 def plot_line(ax, format, fname, label, xcol, ycol, errcol=None):
     """
@@ -63,3 +63,10 @@ def plot_bars(ax, xcol, ycol, color=None, hatch=None, label=None):
     #    ax.errorbar(xcol, ycol, yerr=errcol, data=data, fmt=format, label=label, capsize=5)
     #else:
     #    ax.plot(xcol, ycol, format, data=data, label=label)
+
+def dummy_bar(ax, label, color=None, hatch=None):
+    if hatch is not None:
+        edgecolor=color
+        color='white'
+    else: edgecolor=None
+    ax.bar([0], [0], color=color, hatch=hatch, edgecolor=edgecolor, label=label)

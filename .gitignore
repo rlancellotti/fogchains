@@ -50,3 +50,4 @@ src/*.drawio.*
 src/*.drawio
 simulations/time.txt
 simulations/times.data
+**/__pycache__/*
