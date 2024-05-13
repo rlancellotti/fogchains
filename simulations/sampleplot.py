@@ -45,7 +45,7 @@ def plot_utilization(sim_data, th_data):
     #print(x, y)
     plot_bars(ax, x, y, color='tab:blue', label='Theoretical')
     plt.legend()
-    plt.savefig('utilization.png')
+    plt.savefig('analysis/utilization.png')
 
 def plot_times(sim_data, th_data):
     # plot times
@@ -81,7 +81,7 @@ def plot_times(sim_data, th_data):
     y=[tnet[i] for i in range(len(get_chains(sim_data)))]
     plot_bars(ax, x, y, color='tab:blue', hatch='\\\\')
     plt.legend()
-    plt.savefig('tresp.png')
+    plt.savefig('analysis/tresp.png')
 
 if __name__ == "__main__":
     set_fonts(font_size=12)
