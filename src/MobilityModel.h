@@ -10,7 +10,7 @@ using namespace omnetpp;
 namespace fog {
 
 /**
- * Consumes jobs; see NED file for more info.
+ * Implements support for modules mobility
  */
 class MobilityModel : public cSimpleModule
 {
